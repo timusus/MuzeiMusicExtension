@@ -1,8 +1,6 @@
 MuzeiMusicExtension
 ===================
 
-# Muzei Music Extension
-
 A simple music extension for Roman Nurik's Muzei, which displays the artwork of the currently playing song in Muzei.
 
 1. The music extension receives the Android 'meta-changed' intent
@@ -12,25 +10,25 @@ A simple music extension for Roman Nurik's Muzei, which displays the artwork of 
 
 Muzei Music Extension is on the [Play Store](https://play.google.com/store/apps/details?id=com.simplecity.muzei.music)
 
-# Changelog
+Changelog:
 
-### Current Version: 1.0.0
+Current Version: 1.0.0
 
-### 1.0.0
+1.0.0
 
  * Initial release
 
-# Developed By
+Developed By
 
  * Tim Malseed - <t.malseed@gmail.com>
 
 
-### Credits
+Credits
 
  * [Roman Nurik](https://plus.google.com/+RomanNurik/) - Author of Muzei
 
 
-# License
+License
 
     Copyright 2013 Tim Malseed
 
