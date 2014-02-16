@@ -73,6 +73,12 @@ public class MusicExtensionUtils {
      */
     private static boolean updateFromMediaStore(final MusicExtensionSource musicExtensionSource, final String artistName, final String albumName, final String trackName) {
 
+        if (albumName.equals(MediaStore.UNKNOWN_STRING)) {
+            return false;
+        }
+
+        String path = null;
+
         //1. Try to get the album art from the MediaStore.Audio.Albums.ALBUM_ART column
         Log.i(TAG, "Attempting to retrieve artwork from MediaStore ALBUM_ART column");
         String[] projection = new String[]{
@@ -90,12 +96,12 @@ public class MusicExtensionUtils {
                 null, null);
 
         if (cursor != null && cursor.moveToFirst()) {
-            String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
-            if (path != null) {
-                Uri uri = Uri.fromFile(new File(path));
+            String artworkPath = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
+            if (artworkPath != null) {
+                Uri uri = Uri.fromFile(new File(artworkPath));
                 Log.i(TAG, "Artwork found @ " + uri);
-                musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
-                return true;
+                //musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
+                //return true;
             }
         }
 
@@ -103,6 +109,7 @@ public class MusicExtensionUtils {
         Log.d(TAG, "Attempting to retrieve artwork from MediaStore _ID column");
         projection = new String[]{
                 MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.DATA,
                 MediaStore.Audio.Media.ARTIST,
                 MediaStore.Audio.Media.ALBUM};
 
@@ -116,6 +123,7 @@ public class MusicExtensionUtils {
 
         if (cursor != null && cursor.moveToFirst()) {
             int songId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
+            path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
             Uri uri = Uri.parse("content://media/external/audio/media/" + songId + "/albumart");
             ParcelFileDescriptor pfd;
             try {
@@ -123,14 +131,30 @@ public class MusicExtensionUtils {
                 if (pfd != null) {
                     //The artwork exists at this uri
                     Log.d("MusicExtensionUtils", "Artwork found @ " + uri);
-                    musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
+                    //musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
                     try {
                         pfd.close();
                     } catch (IOException ignored) {
                     }
-                    return true;
+                    // return true;
                 }
             } catch (FileNotFoundException ignored) {
+            }
+        }
+
+        // 3. Try to find the artwork within the folder
+        Log.d(TAG, "Attempting to retrieve artwork from folder");
+        if (path != null) {
+            int lastSlash = path.lastIndexOf('/');
+            if (lastSlash > 0) {
+                String artworkPath = path.substring(0, lastSlash + 1) + "AlbumArt.jpg";
+                File file = new File(artworkPath);
+                if (file.exists()) {
+                    Uri uri = Uri.fromFile(file);
+                    Log.d("MusicExtensionUtils", "Artwork found @ " + uri);
+                    musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
+                    return true;
+                }
             }
         }
         return false;
@@ -144,7 +168,12 @@ public class MusicExtensionUtils {
      * @param albumName            the name of the album
      * @param trackName            the name of the song
      */
-    private static void updateFromLastFM(final MusicExtensionSource musicExtensionSource, final String artistName, final String albumName, final String trackName) {
+    private static void updateFromLastFM(final MusicExtensionSource musicExtensionSource,
+                                         final String artistName, final String albumName, final String trackName) {
+
+        if (albumName.equals(MediaStore.UNKNOWN_STRING)) {
+            return;
+        }
 
         String URL = "http://ws.audioscrobbler.com/2.0/?";
 
