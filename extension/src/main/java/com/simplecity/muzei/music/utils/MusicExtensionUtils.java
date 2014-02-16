@@ -1,8 +1,11 @@
 package com.simplecity.muzei.music.utils;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -11,6 +14,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.simplecity.muzei.music.MusicExtensionSource;
@@ -24,7 +28,9 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -100,8 +106,8 @@ public class MusicExtensionUtils {
             if (artworkPath != null) {
                 Uri uri = Uri.fromFile(new File(artworkPath));
                 Log.i(TAG, "Artwork found @ " + uri);
-                //musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
-                //return true;
+                musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
+                return true;
             }
         }
 
@@ -131,12 +137,12 @@ public class MusicExtensionUtils {
                 if (pfd != null) {
                     //The artwork exists at this uri
                     Log.d("MusicExtensionUtils", "Artwork found @ " + uri);
-                    //musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
+                    musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
                     try {
                         pfd.close();
                     } catch (IOException ignored) {
                     }
-                    // return true;
+                    return true;
                 }
             } catch (FileNotFoundException ignored) {
             }
@@ -217,7 +223,77 @@ public class MusicExtensionUtils {
 
                             musicExtensionSource.publishArtwork(artistName, albumName, trackName, Uri.parse(uri));
 
-                            //Todo: Add the downloaded album art to the MediaStore, since we're only downloading it because it wasn't found there.
+                            //Add the artwork to the MediaStore, since we're only here because it wasn't found there
+
+                            ImageRequest imageRequest = new ImageRequest(uri, new Response.Listener<Bitmap>() {
+                                @Override
+                                public void onResponse(Bitmap bitmap) {
+
+                                    //First, save the artwork on the device
+                                    String savePath = Environment.getExternalStorageDirectory() + "/albumthumbs/" + String.valueOf(System.currentTimeMillis());
+                                    if (ensureFileExists(savePath)) {
+                                        try {
+
+                                            OutputStream outputStream = new FileOutputStream(savePath);
+                                            boolean success = bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outputStream);
+                                            outputStream.close();
+
+                                            //Now that the artwork is saved, add it to the MediaStore
+
+                                            String[] projection = new String[]{
+                                                    MediaStore.Audio.Media._ID,
+                                                    MediaStore.Audio.Media.ALBUM_ID,
+                                                    MediaStore.Audio.Media.ARTIST,
+                                                    MediaStore.Audio.Media.ALBUM,
+                                                    MediaStore.Audio.Media.DATA
+                                            };
+
+                                            Cursor cursor = musicExtensionSource.getApplicationContext().getContentResolver().query(
+                                                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                                                    projection,
+                                                    MediaStore.Audio.Albums.ALBUM + " ='" + albumName.replaceAll("'", "''") + "'"
+                                                            + " AND "
+                                                            + MediaStore.Audio.Albums.ARTIST + " ='" + artistName.replaceAll("'", "''") + "'",
+                                                    null, null);
+
+                                            if (cursor != null && cursor.moveToFirst()) {
+                                                int albumId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+
+                                                ContentValues values = new ContentValues();
+                                                values.put("album_id", albumId);
+                                                values.put("_data", savePath);
+
+                                                Uri newuri = musicExtensionSource.getApplicationContext().getContentResolver().insert(Uri.parse("content://media/external/audio/albumart"), values);
+                                                if (newuri == null) {
+                                                    //Failed to insert into the database
+                                                    success = false;
+                                                }
+
+                                                //If we failed to either save the bitmap on the device, or save it to the database, delete the File we created
+                                                if (!success) {
+                                                    File f = new File(savePath);
+                                                    f.delete();
+                                                }
+                                            }
+
+                                        } catch (FileNotFoundException e) {
+                                            Log.e(TAG, "error creating file", e);
+                                        } catch (IOException e) {
+                                            Log.e(TAG, "error creating file", e);
+                                        }
+
+                                    }
+                                }
+                            }, 0, 0, Bitmap.Config.RGB_565, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    //Error response for the image download
+                                    Log.e("Error: ", "error" + error.getMessage());
+                                }
+                            }
+                            );
+
+                            addToRequestQueue(musicExtensionSource.getApplicationContext(), imageRequest);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -226,11 +302,42 @@ public class MusicExtensionUtils {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                //Error response for the Uri retrieval
                 Log.e("Error: ", "error" + error.getMessage());
             }
         }
         );
+
         addToRequestQueue(musicExtensionSource.getApplicationContext(), req);
+    }
+
+    /**
+     * Checks to see whether the path exists, or creates it if not
+     *
+     * @param path the path to check or create
+     * @return {@link boolean} whether the path exists and or was created
+     */
+    private static boolean ensureFileExists(String path) {
+        File file = new File(path);
+        if (file.exists()) {
+            return true;
+        } else {
+            //Don't create the first directory in the path
+            //(for example, do not create /sdcard if the SD card is not mounted)
+            int secondSlash = path.indexOf('/', 1);
+            if (secondSlash < 1) return false;
+            String directoryPath = path.substring(0, secondSlash);
+            File directory = new File(directoryPath);
+            if (!directory.exists())
+                return false;
+            file.getParentFile().mkdirs();
+            try {
+                return file.createNewFile();
+            } catch (IOException e) {
+                Log.e(TAG, "File creation failed", e);
+            }
+            return false;
+        }
     }
 
     private static RequestQueue getRequestQueue(Context context) {
