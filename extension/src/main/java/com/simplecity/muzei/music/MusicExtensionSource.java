@@ -83,7 +83,9 @@ public class MusicExtensionSource extends RemoteMuzeiArtSource {
                     final String artistName = extras.getString("artist");
                     final String albumName = extras.getString("album");
                     final String trackName = extras.getString("track");
-                    MusicExtensionUtils.updateMuzei(this, artistName, albumName, trackName);
+                    if (artistName != null && albumName != null && trackName != null) {
+                        MusicExtensionUtils.updateMuzei(this, artistName, albumName, trackName);
+                    }
                 }
             }
         }

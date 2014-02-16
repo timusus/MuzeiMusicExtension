@@ -51,6 +51,10 @@ android {
             runProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), file('proguard-project.txt')
             signingConfig signingConfigs.release
+            applicationVariants.all { variant ->
+                def file = variant.outputFile
+                variant.outputFile = new File(file.parent, file.name.replace(".apk", "-" + "v" + versionProps['name'] + ".apk"))
+            }
         }
     }
 }
