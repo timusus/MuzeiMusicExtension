@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Muzei Music Extension</string>
+    <string name="source_name">Muzei Music Extension</string>
+    <string name="source_description">Album artwork from your library!</string>
+</resources>
