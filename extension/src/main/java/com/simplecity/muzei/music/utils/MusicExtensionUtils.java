@@ -69,6 +69,10 @@ public class MusicExtensionUtils {
      */
     public static void updateMuzei(MusicExtensionSource musicExtensionSource, String artistName, String albumName, String trackName) {
 
+        if (artistName == null || albumName == null || trackName == null) {
+            return;
+        }
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(musicExtensionSource.getApplicationContext());
         boolean wifiOnly = prefs.getBoolean(SettingsActivity.KEY_PREF_WIFI_ONLY, false);
 
@@ -94,6 +98,10 @@ public class MusicExtensionUtils {
      * @return true if a uri was found, false otherwise
      */
     private static boolean updateFromMediaStore(final MusicExtensionSource musicExtensionSource, final String artistName, final String albumName, final String trackName) {
+
+        if (artistName == null || albumName == null || trackName == null) {
+            return false;
+        }
 
         if (albumName.equals(MediaStore.UNKNOWN_STRING)) {
             return false;
