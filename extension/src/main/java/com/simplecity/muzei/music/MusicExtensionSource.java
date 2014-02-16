@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.google.android.apps.muzei.api.Artwork;
 import com.google.android.apps.muzei.api.RemoteMuzeiArtSource;
@@ -61,7 +60,7 @@ public class MusicExtensionSource extends RemoteMuzeiArtSource {
     @Override
     protected void onTryUpdate(int reason) throws RetryException {
         if (reason == UPDATE_REASON_INITIAL) {
-            Log.d(TAG, "Initial Update");
+            //Log.d(TAG, "Initial Update");
             mPrefs = getSharedPreferences();
             String trackName = mPrefs.getString("lastTrackName", null);
             String artistName = mPrefs.getString("lastArtistName", null);

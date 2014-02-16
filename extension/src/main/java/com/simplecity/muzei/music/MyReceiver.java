@@ -21,21 +21,6 @@ public class MyReceiver extends BroadcastReceiver {
                 intent1.putExtras(extras);
                 context.startService(intent1);
             }
-//        } else if (intent.getAction() != null && intent.getAction().equals(MusicExtensionUtils.PLAYSTATE_CHANGED_INTENT)) {
-//            Log.d(TAG, "Playstate changed");
-//            Bundle extras = intent.getExtras();
-//            if (extras != null) {
-//                if (!extras.getBoolean("isPlaying", false)) {
-//                    Intent intent1 = new Intent(context, MusicExtensionSource.class);
-//                    intent1.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
-//                    context.startService(intent1);
-//                } else {
-//                    Intent intent1 = new Intent(context, MusicExtensionSource.class);
-//                    intent1.setAction(MusicExtensionUtils.EXTENSION_UPDATE_INTENT);
-//                    intent1.putExtras(extras);
-//                    context.startService(intent1);
-//                }
-//            }
         }
     }
 }
