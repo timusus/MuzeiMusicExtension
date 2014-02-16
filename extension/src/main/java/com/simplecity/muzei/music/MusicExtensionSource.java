@@ -2,15 +2,22 @@ package com.simplecity.muzei.music;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.apps.muzei.api.Artwork;
 import com.google.android.apps.muzei.api.RemoteMuzeiArtSource;
 import com.simplecity.muzei.music.utils.MusicExtensionUtils;
 
 public class MusicExtensionSource extends RemoteMuzeiArtSource {
+
+    private static final String TAG = "MusicExtensionSource";
+
     private static final String SOURCE_NAME = "MusicExtensionSource";
+
+    private SharedPreferences mPrefs;
 
     /**
      * Remember to call this constructor from an empty constructor!
@@ -32,13 +39,30 @@ public class MusicExtensionSource extends RemoteMuzeiArtSource {
                 .title(trackName)
                 .byline(artistName + " - " + albumName)
                 .imageUri(uri)
-                .viewIntent(new Intent(Intent.ACTION_VIEW, uri))
                 .build());
+
+        mPrefs = getSharedPreferences();
+        SharedPreferences.Editor editor = mPrefs.edit();
+        editor.putString("lastTrackName", trackName);
+        editor.putString("lastArtistName", artistName);
+        editor.putString("lastAlbumName", albumName);
+        editor.putString("lastUri", uri.toString());
+        editor.apply();
     }
 
     @Override
     protected void onTryUpdate(int reason) throws RetryException {
-        //Nothing to do
+        if (reason == UPDATE_REASON_INITIAL) {
+            Log.d(TAG, "Initial Update");
+            mPrefs = getSharedPreferences();
+            String trackName = mPrefs.getString("lastTrackName", null);
+            String artistName = mPrefs.getString("lastArtistName", null);
+            String albumName = mPrefs.getString("lastAlbumName", null);
+            String uri = mPrefs.getString("lastUri", null);
+            if (artistName != null && albumName != null && trackName != null && uri != null) {
+                publishArtwork(artistName, albumName, trackName, Uri.parse(uri));
+            }
+        }
     }
 
     @Override

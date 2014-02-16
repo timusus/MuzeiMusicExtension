@@ -38,7 +38,9 @@ public class MusicExtensionUtils {
 
     private final static String TAG = "MusicExtensionUtils";
 
-    public static final String SCROBBLE_META_CHANGED_INTENT = "com.android.music.metachanged";
+    public static final String META_CHANGED_INTENT = "com.android.music.metachanged";
+
+    //public static final String PLAYSTATE_CHANGED_INTENT = "com.android.music.playstatechanged";
 
     public static final String EXTENSION_UPDATE_INTENT = "com.simplecity.muzei.music.update";
 
@@ -103,6 +105,7 @@ public class MusicExtensionUtils {
 
         if (cursor != null && cursor.moveToFirst()) {
             String artworkPath = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
+            cursor.close();
             if (artworkPath != null) {
                 Uri uri = Uri.fromFile(new File(artworkPath));
                 Log.i(TAG, "Artwork found @ " + uri);
@@ -130,6 +133,7 @@ public class MusicExtensionUtils {
         if (cursor != null && cursor.moveToFirst()) {
             int songId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
             path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+            cursor.close();
             Uri uri = Uri.parse("content://media/external/audio/media/" + songId + "/albumart");
             ParcelFileDescriptor pfd;
             try {
@@ -258,6 +262,7 @@ public class MusicExtensionUtils {
 
                                             if (cursor != null && cursor.moveToFirst()) {
                                                 int albumId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+                                                cursor.close();
 
                                                 ContentValues values = new ContentValues();
                                                 values.put("album_id", albumId);

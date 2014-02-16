@@ -8,9 +8,12 @@ import android.os.Bundle;
 import com.simplecity.muzei.music.utils.MusicExtensionUtils;
 
 public class MyReceiver extends BroadcastReceiver {
+
+    private static final String TAG = "MyReceiver";
+
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent.getAction() != null && intent.getAction().equals(MusicExtensionUtils.SCROBBLE_META_CHANGED_INTENT)) {
+        if (intent.getAction() != null && intent.getAction().equals(MusicExtensionUtils.META_CHANGED_INTENT)) {
             Intent intent1 = new Intent(context, MusicExtensionSource.class);
             intent1.setAction(MusicExtensionUtils.EXTENSION_UPDATE_INTENT);
             Bundle extras = intent.getExtras();
@@ -18,6 +21,21 @@ public class MyReceiver extends BroadcastReceiver {
                 intent1.putExtras(extras);
                 context.startService(intent1);
             }
+//        } else if (intent.getAction() != null && intent.getAction().equals(MusicExtensionUtils.PLAYSTATE_CHANGED_INTENT)) {
+//            Log.d(TAG, "Playstate changed");
+//            Bundle extras = intent.getExtras();
+//            if (extras != null) {
+//                if (!extras.getBoolean("isPlaying", false)) {
+//                    Intent intent1 = new Intent(context, MusicExtensionSource.class);
+//                    intent1.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
+//                    context.startService(intent1);
+//                } else {
+//                    Intent intent1 = new Intent(context, MusicExtensionSource.class);
+//                    intent1.setAction(MusicExtensionUtils.EXTENSION_UPDATE_INTENT);
+//                    intent1.putExtras(extras);
+//                    context.startService(intent1);
+//                }
+//            }
         }
     }
 }

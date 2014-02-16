@@ -22,7 +22,10 @@
 
             <meta-data
                 android:name="color"
-                android:value="#fa0" />
+                android:value="#3f9fe0" />
+
+            <meta-data android:name="settingsActivity"
+                android:value=".SettingsActivity" />
         </service>
 
         <receiver
@@ -37,6 +40,10 @@
                 <action android:name="com.adam.aslfms.notify.playbackcomplete" />
             </intent-filter>
         </receiver>
+
+        <activity android:name=".SettingsActivity"
+            android:label="@string/title_settings"
+            android:exported="true" />
 
     </application>
 
