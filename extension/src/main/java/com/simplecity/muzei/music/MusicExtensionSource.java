@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.android.apps.muzei.api.Artwork;
@@ -24,6 +25,13 @@ public class MusicExtensionSource extends RemoteMuzeiArtSource {
      */
     public MusicExtensionSource() {
         super(SOURCE_NAME);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
     }
 
     /**

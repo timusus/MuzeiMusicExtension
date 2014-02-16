@@ -1,6 +1,27 @@
 <resources>
     <string name="app_name">Muzei Music Extension</string>
-    <string name="source_name">Muzei Music Extension</string>
-    <string name="source_description">Album artwork from your library!</string>
+    <string name="source_name">Music</string>
+    <string name="source_description">Album artwork from your music library</string>
     <string name="title_settings">Settings</string>
+
+    <string name="pref_string_title_download_wifi_only">Download via Wi-Fi only</string>
+    <string name="pref_string_summary_download_wifi_only">Artwork will only be downloaded if a Wi-Fi connection is available</string>
+    <string name="pref_string_title_artwork_resolution">Artwork resolution</string>
+    <string name="pref_string_summary_artwork_resolution">Choose the resolution of the artwork downloaded from Last.fm</string>
+    <string name="pref_size_mega">Large (500px)</string>
+    <string name="pref_size_extra_large">Medium (300px)</string>
+    <string name="pref_size_large">Small (175px)</string>
+
+    <string-array name="pref_size_options_array">
+        <item>@string/pref_size_mega</item>
+        <item>@string/pref_size_extra_large</item>
+        <item>@string/pref_size_large</item>
+    </string-array>
+
+    <string-array name="pref_size_values_array">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
 </resources>

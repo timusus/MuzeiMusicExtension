@@ -2,11 +2,15 @@ package com.simplecity.muzei.music.utils;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -18,6 +22,7 @@ import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.simplecity.muzei.music.MusicExtensionSource;
+import com.simplecity.muzei.music.SettingsActivity;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -64,7 +69,16 @@ public class MusicExtensionUtils {
      */
     public static void updateMuzei(MusicExtensionSource musicExtensionSource, String artistName, String albumName, String trackName) {
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(musicExtensionSource.getApplicationContext());
+        boolean wifiOnly = prefs.getBoolean(SettingsActivity.KEY_PREF_WIFI_ONLY, false);
+
         if (!updateFromMediaStore(musicExtensionSource, artistName, albumName, trackName)) {
+
+            //If we've specified Wi-Fi only and the Wi-Fi is not connected, don't download from last.fm
+            if (wifiOnly && !isWifiOn(musicExtensionSource.getApplicationContext())) {
+                return;
+            }
+
             Log.d(TAG, "Update from MediaStore failed, attempting to retrieve from Last.fm");
             updateFromLastFM(musicExtensionSource, artistName, albumName, trackName);
         }
@@ -204,14 +218,19 @@ public class MusicExtensionUtils {
                     @Override
                     public void onResponse(JSONObject response) {
 
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(musicExtensionSource.getApplicationContext());
+                        String preferred_size = prefs.getString(SettingsActivity.KEY_PREF_ARTWORK_RESOLUTION, SettingsActivity.KEY_PREF_SIZE_MEGA);
+
                         try {
                             JSONObject albumObject = response.getJSONObject("album");
                             JSONArray imagesArray = albumObject.getJSONArray("image");
                             boolean megaImageFound = false;
+                            boolean extraLargeImageFound = false;
+                            boolean largeImageFound = false;
                             String uri = "";
                             for (int i = 0; i < imagesArray.length(); i++) {
                                 JSONObject sizeObject = imagesArray.getJSONObject(i);
-                                if (sizeObject.getString("size").equals("mega")) {
+                                if (sizeObject.getString("size").equals("mega") && preferred_size.equals(SettingsActivity.KEY_PREF_SIZE_MEGA)) {
                                     uri = sizeObject.getString("#text");
                                     megaImageFound = true;
                                 }
@@ -219,11 +238,22 @@ public class MusicExtensionUtils {
                             if (!megaImageFound) {
                                 for (int i = 0; i < imagesArray.length(); i++) {
                                     JSONObject sizeObject = imagesArray.getJSONObject(i);
-                                    if (sizeObject.getString("size").equals("extralarge")) {
+                                    if (sizeObject.getString("size").equals("extralarge") && preferred_size.equals(SettingsActivity.KEY_PREF_SIZE_EXTRA_LARGE)) {
+                                        uri = sizeObject.getString("#text");
+                                        extraLargeImageFound = true;
+                                    }
+                                }
+                            }
+                            if (!megaImageFound && !extraLargeImageFound) {
+                                for (int i = 0; i < imagesArray.length(); i++) {
+                                    JSONObject sizeObject = imagesArray.getJSONObject(i);
+                                    if (sizeObject.getString("size").equals("large") && preferred_size.equals(SettingsActivity.KEY_PREF_SIZE_LARGE)) {
                                         uri = sizeObject.getString("#text");
                                     }
                                 }
                             }
+
+                            Log.i(TAG, "Obtained image uri from Last.fm: " + uri);
 
                             musicExtensionSource.publishArtwork(artistName, albumName, trackName, Uri.parse(uri));
 
@@ -372,5 +402,15 @@ public class MusicExtensionUtils {
         if (sRequestQueue != null) {
             sRequestQueue.cancelAll(tag);
         }
+    }
+
+    private static boolean isWifiOn(Context context) {
+
+        final ConnectivityManager cm = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        //Check the state of the wifi network
+        final NetworkInfo wifiNetwork = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        return wifiNetwork != null && wifiNetwork.isConnectedOrConnecting();
     }
 }
