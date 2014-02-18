@@ -167,6 +167,7 @@ public class MusicExtensionUtils {
                 Uri uri = Uri.fromFile(new File(artworkPath));
                 //Log.i(TAG, "Artwork found @ " + uri);
                 musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
+                cursor.close();
                 return true;
             }
         }
@@ -206,6 +207,7 @@ public class MusicExtensionUtils {
                         pfd.close();
                     } catch (IOException ignored) {
                     }
+                    cursor.close();
                     return true;
                 }
             } catch (FileNotFoundException ignored) {
@@ -453,12 +455,15 @@ public class MusicExtensionUtils {
      * Cancels all pending requests
      */
     private static void cancelPendingRequests() {
-        sRequestQueue.cancelAll(new RequestQueue.RequestFilter() {
-            @Override
-            public boolean apply(Request<?> request) {
-                return true;
-            }
-        });
+
+        if (sRequestQueue != null) {
+            sRequestQueue.cancelAll(new RequestQueue.RequestFilter() {
+                @Override
+                public boolean apply(Request<?> request) {
+                    return true;
+                }
+            });
+        }
     }
 
     private static boolean isWifiOn(Context context) {
