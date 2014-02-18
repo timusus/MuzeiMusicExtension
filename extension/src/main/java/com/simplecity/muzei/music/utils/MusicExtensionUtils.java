@@ -43,10 +43,45 @@ public class MusicExtensionUtils {
 
     private final static String TAG = "MusicExtensionUtils";
 
+    // Generic meta changed intent for most music players
     public static final String META_CHANGED_INTENT = "com.android.music.metachanged";
 
-    //public static final String PLAYSTATE_CHANGED_INTENT = "com.android.music.playstatechanged";
+    // PlayerPro intents
+    public static final String PLAYER_PRO_TRIAL_META_CHANGED_INTENT = "com.tbig.playerpro.metachanged";
+    public static final String PLAYER_PRO_META_CHANGED_INTENT = "com.tbig.playerprotrial.metachanged";
 
+    // Rdio track information is only contained within the Playstate Changed intent
+    public static final String RDIO_PLAYSTATE_CHANGED_INTENT = "com.rdio.android.playstatechanged";
+
+    // Generic play state intent for most music players.
+    // PowerAMP provides track data via this intent rather than metachanged (unless 'send metachanged' is on
+    public static final String PLAYSTATE_CHANGED_INTENT = "com.android.music.playstatechanged";
+
+    // Doubletwist meta changed intent
+    public static final String DOUBLETWIST_META_CHANGED_INTENT = "com.doubleTwist.androidPlayer.metachanged";
+
+    // Rocketplayer meta changed intent
+    public static final String ROCKETPLAYER_META_CHANGED_INTENT = "com.jrtstudio.AnotherMusicPlayer.metachanged";
+
+    // Android Music Player intent (JRT)
+    public static final String ANDROID_MUSIC_PLAYER_META_CHANGED_INTENT = "com.jrtstudio.music.metachanged";
+
+    // Samsung intent
+    public static final String SAMSUNG_META_CHANGED_INTENT = "com.sec.android.app.music.metachanged" ;
+
+    // Rhapsody intent
+    public static final String RHAPSODY_META_CHANGED_INTENT = "com.rhapsody.metachanged" ;
+
+    // MIUI intent
+    public static final String MIUI_META_CHANGED_INTENT = "com.miui.player.playstatechanged" ;
+
+    // HTC intent
+    public static final String HTC_META_CHANGED_INTENT = "com.htc.music.metachanged" ;
+
+    // Used in the notification listener service to determine if notification was filled by Spotify
+    public static final String SPOTIFY_PACKAGE_NAME = "com.spotify.mobile.android.ui";
+
+    // Tells the MusicExtensionSource to update itself
     public static final String EXTENSION_UPDATE_INTENT = "com.simplecity.muzei.music.update";
 
     /**
@@ -69,7 +104,7 @@ public class MusicExtensionUtils {
      */
     public static void updateMuzei(MusicExtensionSource musicExtensionSource, String artistName, String albumName, String trackName) {
 
-        if (artistName == null || albumName == null || trackName == null) {
+        if (musicExtensionSource == null || artistName == null || albumName == null || trackName == null) {
             return;
         }
 
@@ -127,13 +162,16 @@ public class MusicExtensionUtils {
 
         if (cursor != null && cursor.moveToFirst()) {
             String artworkPath = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
-            cursor.close();
             if (artworkPath != null) {
                 Uri uri = Uri.fromFile(new File(artworkPath));
                 //Log.i(TAG, "Artwork found @ " + uri);
                 musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
                 return true;
             }
+        }
+
+        if (cursor != null) {
+            cursor.close();
         }
 
         //2. Try to find the artwork in the MediaStore based on the trackId instead of the albumId
@@ -155,7 +193,6 @@ public class MusicExtensionUtils {
         if (cursor != null && cursor.moveToFirst()) {
             int songId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
             path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-            cursor.close();
             Uri uri = Uri.parse("content://media/external/audio/media/" + songId + "/albumart");
             ParcelFileDescriptor pfd;
             try {
@@ -173,9 +210,15 @@ public class MusicExtensionUtils {
             } catch (FileNotFoundException ignored) {
             }
         }
+        if (cursor != null) {
+            cursor.close();
+        }
 
         // 3. Try to find the artwork within the folder
         //Log.d(TAG, "Attempting to retrieve artwork from folder");
+
+        //Todo: Check other common paths/filetypes, such as Folder.jpg
+
         if (path != null) {
             int lastSlash = path.lastIndexOf('/');
             if (lastSlash > 0) {
@@ -300,7 +343,6 @@ public class MusicExtensionUtils {
 
                                             if (cursor != null && cursor.moveToFirst()) {
                                                 int albumId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
-                                                cursor.close();
 
                                                 ContentValues values = new ContentValues();
                                                 values.put("album_id", albumId);
@@ -317,6 +359,9 @@ public class MusicExtensionUtils {
                                                     File f = new File(savePath);
                                                     f.delete();
                                                 }
+                                            }
+                                            if (cursor != null) {
+                                                cursor.close();
                                             }
 
                                         } catch (FileNotFoundException e) {
