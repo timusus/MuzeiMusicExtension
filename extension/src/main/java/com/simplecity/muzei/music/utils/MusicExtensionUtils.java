@@ -247,7 +247,8 @@ public class MusicExtensionUtils {
     private static void updateFromLastFM(final MusicExtensionSource musicExtensionSource,
                                          final String artistName, final String albumName, final String trackName) {
 
-        getRequestQueue(musicExtensionSource.getApplicationContext()).cancelAll(VOLLEY_REQUEST_TAG);
+        //Cancel any prending Volley requests, as we don't care about the previous track anymore.
+        cancelPendingRequests();
 
         if (albumName.equals(MediaStore.UNKNOWN_STRING)) {
             return;

@@ -27,7 +27,6 @@ public class NLService extends NotificationListenerService {
 
     private String TAG = this.getClass().getSimpleName();
 
-
     @Override
     public void onNotificationPosted(StatusBarNotification statusBarNotification) {
 
@@ -45,13 +44,11 @@ public class NLService extends NotificationListenerService {
             intent.putExtras(bundle);
             startService(intent);
         }
-
     }
-
 
     @Override
     public void onNotificationRemoved(StatusBarNotification statusBarNotification) {
-
+        //Nothing to do
     }
 
     /**
