@@ -247,6 +247,8 @@ public class MusicExtensionUtils {
     private static void updateFromLastFM(final MusicExtensionSource musicExtensionSource,
                                          final String artistName, final String albumName, final String trackName) {
 
+        getRequestQueue(musicExtensionSource.getApplicationContext()).cancelAll(VOLLEY_REQUEST_TAG);
+
         if (albumName.equals(MediaStore.UNKNOWN_STRING)) {
             return;
         }
@@ -447,15 +449,15 @@ public class MusicExtensionUtils {
     }
 
     /**
-     * Cancels all pending requests by the specified VOLLEY_REQUEST_TAG, it is important
-     * to specify a VOLLEY_REQUEST_TAG so that the pending/ongoing requests can be cancelled.
-     *
-     * @param tag
+     * Cancels all pending requests
      */
-    private void cancelPendingRequests(Object tag) {
-        if (sRequestQueue != null) {
-            sRequestQueue.cancelAll(tag);
-        }
+    private static void cancelPendingRequests() {
+        sRequestQueue.cancelAll(new RequestQueue.RequestFilter() {
+            @Override
+            public boolean apply(Request<?> request) {
+                return true;
+            }
+        });
     }
 
     private static boolean isWifiOn(Context context) {
