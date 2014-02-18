@@ -220,7 +220,7 @@ public class MusicExtensionUtils {
         // 3. Try to find the artwork within the folder
         //Log.d(TAG, "Attempting to retrieve artwork from folder");
 
-        //Todo: Check other common paths/filetypes, such as Folder.jpg
+        //Todo: Check other common paths/filetypes
 
         if (path != null) {
             int lastSlash = path.lastIndexOf('/');
@@ -232,6 +232,15 @@ public class MusicExtensionUtils {
                     //Log.d("MusicExtensionUtils", "Artwork found @ " + uri);
                     musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
                     return true;
+                } else {
+                    artworkPath = path.substring(0, lastSlash + 1) + "Folder.jpg";
+                    file = new File(artworkPath);
+                    if (file.exists()) {
+                        Uri uri = Uri.fromFile(file);
+                        //Log.d("MusicExtensionUtils", "Artwork found @ " + uri);
+                        musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
+                        return true;
+                    }
                 }
             }
         }
@@ -246,6 +255,7 @@ public class MusicExtensionUtils {
      * @param albumName            the name of the album
      * @param trackName            the name of the song
      */
+
     private static void updateFromLastFM(final MusicExtensionSource musicExtensionSource,
                                          final String artistName, final String albumName, final String trackName) {
 
