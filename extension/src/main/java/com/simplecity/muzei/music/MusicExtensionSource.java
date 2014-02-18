@@ -46,6 +46,7 @@ public class MusicExtensionSource extends RemoteMuzeiArtSource {
                 .title(trackName)
                 .byline(artistName + " - " + albumName)
                 .imageUri(uri)
+                .viewIntent(new Intent("android.intent.action.MUSIC_PLAYER"))
                 .build());
 
         mPrefs = getSharedPreferences();
