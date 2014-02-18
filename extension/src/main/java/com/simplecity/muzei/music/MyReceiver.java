@@ -49,6 +49,18 @@ public class MyReceiver extends BroadcastReceiver {
                     context.startService(intent1);
                 }
             }
+            if (action.equals(MusicExtensionUtils.PLAYSTATE_CHANGED_INTENT)) {
+                //Todo: Check for other playstate changed intents as well
+                Bundle extras = intent.getExtras();
+                if (extras != null) {
+                    if (!extras.getBoolean("playing", true)) {
+                        //The song has been paused. Set the Muzei artwork to something else.
+                        Intent intent1 = new Intent(context, MusicExtensionSource.class);
+                        intent1.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
+                        context.startService(intent1);
+                    }
+                }
+            }
         }
     }
 }

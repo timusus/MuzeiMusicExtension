@@ -87,6 +87,8 @@ public class MusicExtensionSource extends RemoteMuzeiArtSource {
                         MusicExtensionUtils.updateMuzei(this, artistName, albumName, trackName);
                     }
                 }
+            } else if (intent.getAction().equals(MusicExtensionUtils.EXTENSION_CLEAR_INTENT)) {
+                //Todo: Set a default wallpaper, chosen by the user
             }
         }
     }

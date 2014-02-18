@@ -85,6 +85,9 @@ public class MusicExtensionUtils {
     // Tells the MusicExtensionSource to update itself
     public static final String EXTENSION_UPDATE_INTENT = "com.simplecity.muzei.music.update";
 
+    // Tells the MusicExtensionSource to update itself
+    public static final String EXTENSION_CLEAR_INTENT = "com.simplecity.muzei.music.clear";
+
     /**
      * Request queue for Volley
      */
