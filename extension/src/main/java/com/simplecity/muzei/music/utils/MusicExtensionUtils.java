@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
@@ -67,16 +68,16 @@ public class MusicExtensionUtils {
     public static final String ANDROID_MUSIC_PLAYER_META_CHANGED_INTENT = "com.jrtstudio.music.metachanged";
 
     // Samsung intent
-    public static final String SAMSUNG_META_CHANGED_INTENT = "com.sec.android.app.music.metachanged" ;
+    public static final String SAMSUNG_META_CHANGED_INTENT = "com.sec.android.app.music.metachanged";
 
     // Rhapsody intent
-    public static final String RHAPSODY_META_CHANGED_INTENT = "com.rhapsody.metachanged" ;
+    public static final String RHAPSODY_META_CHANGED_INTENT = "com.rhapsody.metachanged";
 
     // MIUI intent
-    public static final String MIUI_META_CHANGED_INTENT = "com.miui.player.playstatechanged" ;
+    public static final String MIUI_META_CHANGED_INTENT = "com.miui.player.playstatechanged";
 
     // HTC intent
-    public static final String HTC_META_CHANGED_INTENT = "com.htc.music.metachanged" ;
+    public static final String HTC_META_CHANGED_INTENT = "com.htc.music.metachanged";
 
     // Used in the notification listener service to determine if notification was filled by Spotify
     public static final String SPOTIFY_PACKAGE_NAME = "com.spotify.mobile.android.ui";
@@ -465,5 +466,9 @@ public class MusicExtensionUtils {
         //Check the state of the wifi network
         final NetworkInfo wifiNetwork = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         return wifiNetwork != null && wifiNetwork.isConnectedOrConnecting();
+    }
+
+    public static boolean hasJellyBeanMR2() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
     }
 }
