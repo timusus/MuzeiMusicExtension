@@ -27,7 +27,8 @@ Current Version: 1.0.0
 - Rocket Player
 - Doubletwist
 - Android Music Player
-Untested but hopefully now working:
+
+ * Untested but hopefully now working:
 - MIUI
 - Rhapsody
 - Samsung Music Player
