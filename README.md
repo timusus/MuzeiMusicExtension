@@ -18,6 +18,25 @@ Current Version: 1.0.0
 
  * Initial release
 
+1.0.1
+ * Add support for many more music players, including:
+- Spotify (requires Android 4.3 & notification access)
+- Rdio
+- PowerAMP
+- PlayerPro
+- Rocket Player
+- Doubletwist
+- Android Music Player
+Untested but hopefully now working:
+- MIUI
+- Rhapsody
+- Samsung Music Player
+- HTC Music Player
+
+ * Clicking track info now opens music player chooser
+
+ * Some potential performance & bug fixes
+
 **Developed By**
 
  * Tim Malseed - <t.malseed@gmail.com>
