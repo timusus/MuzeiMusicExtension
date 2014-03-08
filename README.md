@@ -12,9 +12,9 @@ Muzei Music Extension is on the [Play Store](https://play.google.com/store/apps/
 
 **Changelog:**
 
-Current Version: 1.0.0
+Current Version: 1.0.1
 
-1.0.1
+1.0.0
 
  * Initial release
 
