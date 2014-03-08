@@ -26,39 +26,27 @@ public class MyReceiver extends BroadcastReceiver {
 //            }
 //        }
 
-        String action = intent.getAction();
-        if (action != null) {
-            if (action.equals(MusicExtensionUtils.META_CHANGED_INTENT)
-                    || action.equals(MusicExtensionUtils.PLAYSTATE_CHANGED_INTENT)
-                    || action.equals(MusicExtensionUtils.PLAYER_PRO_TRIAL_META_CHANGED_INTENT)
-                    || action.equals(MusicExtensionUtils.PLAYER_PRO_META_CHANGED_INTENT)
-                    || action.equals(MusicExtensionUtils.RDIO_PLAYSTATE_CHANGED_INTENT)
-                    || action.equals(MusicExtensionUtils.DOUBLETWIST_META_CHANGED_INTENT)
-                    || action.equals(MusicExtensionUtils.ROCKETPLAYER_META_CHANGED_INTENT)
-                    || action.equals(MusicExtensionUtils.ANDROID_MUSIC_PLAYER_META_CHANGED_INTENT)
-                    || action.equals(MusicExtensionUtils.SAMSUNG_META_CHANGED_INTENT)
-                    || action.equals(MusicExtensionUtils.RHAPSODY_META_CHANGED_INTENT)
-                    || action.equals(MusicExtensionUtils.MIUI_META_CHANGED_INTENT)
-                    || action.equals(MusicExtensionUtils.HTC_META_CHANGED_INTENT)
-                    ) {
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            final String artistName = extras.getString("artist");
+            final String albumName = extras.getString("album");
+            final String trackName = extras.getString("track");
+
+            if (artistName != null && albumName != null && trackName != null) {
                 Intent intent1 = new Intent(context, MusicExtensionSource.class);
                 intent1.setAction(MusicExtensionUtils.EXTENSION_UPDATE_INTENT);
-                Bundle extras = intent.getExtras();
-                if (extras != null) {
-                    intent1.putExtras(extras);
-                    context.startService(intent1);
-                }
+                intent1.putExtra("artist", artistName);
+                intent1.putExtra("album", albumName);
+                intent1.putExtra("track", trackName);
+                context.startService(intent1);
             }
-            if (action.equals(MusicExtensionUtils.PLAYSTATE_CHANGED_INTENT)) {
-                //Todo: Check for other playstate changed intents as well
-                Bundle extras = intent.getExtras();
-                if (extras != null) {
-                    if (!extras.getBoolean("playing", true)) {
-                        //The song has been paused. Set the Muzei artwork to something else.
-                        Intent intent1 = new Intent(context, MusicExtensionSource.class);
-                        intent1.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
-                        context.startService(intent1);
-                    }
+
+            if (extras.containsKey("playing")) {
+                if (!extras.getBoolean("playing", true)) {
+                    //The song has been paused. Set the Muzei artwork to something else.
+                    Intent intent1 = new Intent(context, MusicExtensionSource.class);
+                    intent1.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
+                    context.startService(intent1);
                 }
             }
         }
