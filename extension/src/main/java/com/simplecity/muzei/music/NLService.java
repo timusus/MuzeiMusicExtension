@@ -3,6 +3,7 @@ package com.simplecity.muzei.music;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.content.Intent;
+import android.media.RemoteController;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
@@ -23,7 +24,7 @@ import java.util.List;
 
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-public class NLService extends NotificationListenerService {
+public class NLService extends NotificationListenerService implements RemoteController.OnClientUpdateListener {
 
     private String TAG = this.getClass().getSimpleName();
 
@@ -117,5 +118,32 @@ public class NLService extends NotificationListenerService {
         }
 
         return text;
+    }
+
+    //TODO: Why aren't any of the Log messages below being received?
+
+    @Override
+    public void onClientChange(boolean clearing) {
+        Log.i(TAG, "ClientChange");
+    }
+
+    @Override
+    public void onClientPlaybackStateUpdate(int state) {
+        Log.i(TAG, "ClientPlaybackStateUpdate");
+    }
+
+    @Override
+    public void onClientPlaybackStateUpdate(int state, long stateChangeTimeMs, long currentPosMs, float speed) {
+        Log.i(TAG, "ClientPlaybackStateUpdate");
+    }
+
+    @Override
+    public void onClientTransportControlUpdate(int transportControlFlags) {
+        Log.i(TAG, "ClientTransportControlUpdate");
+    }
+
+    @Override
+    public void onClientMetadataUpdate(RemoteController.MetadataEditor metadataEditor) {
+        Log.i(TAG, metadataEditor.toString());
     }
 }
