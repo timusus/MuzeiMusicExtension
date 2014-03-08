@@ -77,6 +77,18 @@
                 <action android:name="com.doubleTwist.androidPlayer.metachanged" />
                 <action android:name="com.doubleTwist.androidPlayer.playstatechanged" />
 
+                <!-- Pandora (Tested, not working) -->
+                <action android:name="com.pandora.android.metachanged" />
+                <action android:name="com.pandora.android.playstatechanged" />
+
+                <!-- WinAMP (Untested) -->
+                <action android:name="com.nullsoft.winamp.playstatechanged" />
+                <action android:name="com.nullsoft.winamp.metachanged" />
+
+                <!-- 8Tracks (Untested) -->
+                <action android:name="com.e8tracks.playstatechanged" />
+                <action android:name="com.e8tracks.metachanged" />
+
             </intent-filter>
         </receiver>
 

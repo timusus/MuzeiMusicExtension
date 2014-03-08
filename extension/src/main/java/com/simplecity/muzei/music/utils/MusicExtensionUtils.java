@@ -44,41 +44,6 @@ public class MusicExtensionUtils {
 
     private final static String TAG = "MusicExtensionUtils";
 
-    // Generic meta changed intent for most music players
-    public static final String META_CHANGED_INTENT = "com.android.music.metachanged";
-
-    // PlayerPro intents
-    public static final String PLAYER_PRO_TRIAL_META_CHANGED_INTENT = "com.tbig.playerpro.metachanged";
-    public static final String PLAYER_PRO_META_CHANGED_INTENT = "com.tbig.playerprotrial.metachanged";
-
-    // Rdio track information is only contained within the Playstate Changed intent
-    public static final String RDIO_PLAYSTATE_CHANGED_INTENT = "com.rdio.android.playstatechanged";
-
-    // Generic play state intent for most music players.
-    // PowerAMP provides track data via this intent rather than metachanged (unless 'send metachanged' is on
-    public static final String PLAYSTATE_CHANGED_INTENT = "com.android.music.playstatechanged";
-
-    // Doubletwist meta changed intent
-    public static final String DOUBLETWIST_META_CHANGED_INTENT = "com.doubleTwist.androidPlayer.metachanged";
-
-    // Rocketplayer meta changed intent
-    public static final String ROCKETPLAYER_META_CHANGED_INTENT = "com.jrtstudio.AnotherMusicPlayer.metachanged";
-
-    // Android Music Player intent (JRT)
-    public static final String ANDROID_MUSIC_PLAYER_META_CHANGED_INTENT = "com.jrtstudio.music.metachanged";
-
-    // Samsung intent
-    public static final String SAMSUNG_META_CHANGED_INTENT = "com.sec.android.app.music.metachanged";
-
-    // Rhapsody intent
-    public static final String RHAPSODY_META_CHANGED_INTENT = "com.rhapsody.metachanged";
-
-    // MIUI intent
-    public static final String MIUI_META_CHANGED_INTENT = "com.miui.player.playstatechanged";
-
-    // HTC intent
-    public static final String HTC_META_CHANGED_INTENT = "com.htc.music.metachanged";
-
     // Used in the notification listener service to determine if notification was filled by Spotify
     public static final String SPOTIFY_PACKAGE_NAME = "com.spotify.mobile.android.ui";
 
