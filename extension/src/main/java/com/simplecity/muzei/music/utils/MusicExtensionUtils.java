@@ -47,7 +47,6 @@ public class MusicExtensionUtils {
     // Used in the notification listener service to determine if notification was filled by Spotify
     public static final String SPOTIFY_PACKAGE_NAME = "com.spotify.mobile.android.ui";
 
-
     // Tells the MusicExtensionSource to update itself
     public static final String EXTENSION_UPDATE_INTENT = "com.simplecity.muzei.music.update";
 
@@ -262,7 +261,6 @@ public class MusicExtensionUtils {
                             JSONArray imagesArray = albumObject.getJSONArray("image");
                             boolean megaImageFound = false;
                             boolean extraLargeImageFound = false;
-                            boolean largeImageFound = false;
                             String uri = "";
                             for (int i = 0; i < imagesArray.length(); i++) {
                                 JSONObject sizeObject = imagesArray.getJSONObject(i);
@@ -457,5 +455,9 @@ public class MusicExtensionUtils {
 
     public static boolean hasJellyBeanMR2() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
+    }
+
+    public static boolean hasKitKat() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
     }
 }

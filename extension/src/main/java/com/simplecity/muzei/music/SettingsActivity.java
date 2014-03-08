@@ -15,7 +15,7 @@ public class SettingsActivity extends PreferenceActivity {
     public static String KEY_PREF_SIZE_MEGA = "0";
     public static String KEY_PREF_SIZE_EXTRA_LARGE = "1";
     public static String KEY_PREF_SIZE_LARGE = "2";
-    public static String KEY_PREF_SPOTIFY = "pref_key_spotify";
+    public static String KEY_PREF_NOTIFICATIONS = "pref_key_notifications";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +40,7 @@ public class SettingsActivity extends PreferenceActivity {
 
             //Disable the Spotify notification access preference on API < 4.3 (Notification Listener Service not available)
             if (!MusicExtensionUtils.hasJellyBeanMR2()) {
-                Preference spotifyPreference = findPreference(KEY_PREF_SPOTIFY);
+                Preference spotifyPreference = findPreference(KEY_PREF_NOTIFICATIONS);
                 if (spotifyPreference != null) {
                     spotifyPreference.setEnabled(false);
                 }

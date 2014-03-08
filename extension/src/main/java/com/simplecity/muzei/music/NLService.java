@@ -2,7 +2,10 @@ package com.simplecity.muzei.music;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
 import android.media.RemoteController;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,10 +26,38 @@ import java.util.Date;
 import java.util.List;
 
 
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+@TargetApi(Build.VERSION_CODES.KITKAT)
 public class NLService extends NotificationListenerService implements RemoteController.OnClientUpdateListener {
 
     private String TAG = this.getClass().getSimpleName();
+
+    private RemoteController mRemoteController;
+
+    @SuppressWarnings("NewApi")
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        if (MusicExtensionUtils.hasKitKat()) {
+
+            mRemoteController = new RemoteController(this, this);
+            mRemoteController.setArtworkConfiguration(1024, 1024);
+            ((AudioManager) getSystemService(Context.AUDIO_SERVICE))
+                    .registerRemoteController(mRemoteController);
+        }
+    }
+
+    @SuppressWarnings("NewApi")
+    @Override
+    public void onDestroy() {
+
+        if (MusicExtensionUtils.hasKitKat()) {
+            ((AudioManager) getSystemService(Context.AUDIO_SERVICE))
+                    .unregisterRemoteController(mRemoteController);
+        }
+
+        super.onDestroy();
+    }
 
     @Override
     public void onNotificationPosted(StatusBarNotification statusBarNotification) {
@@ -120,30 +151,52 @@ public class NLService extends NotificationListenerService implements RemoteCont
         return text;
     }
 
-    //TODO: Why aren't any of the Log messages below being received?
-
     @Override
     public void onClientChange(boolean clearing) {
-        Log.i(TAG, "ClientChange");
     }
 
     @Override
     public void onClientPlaybackStateUpdate(int state) {
-        Log.i(TAG, "ClientPlaybackStateUpdate");
     }
 
     @Override
     public void onClientPlaybackStateUpdate(int state, long stateChangeTimeMs, long currentPosMs, float speed) {
-        Log.i(TAG, "ClientPlaybackStateUpdate");
     }
 
     @Override
     public void onClientTransportControlUpdate(int transportControlFlags) {
-        Log.i(TAG, "ClientTransportControlUpdate");
     }
 
     @Override
     public void onClientMetadataUpdate(RemoteController.MetadataEditor metadataEditor) {
-        Log.i(TAG, metadataEditor.toString());
+
+        String artist = metadataEditor.getString(MediaMetadataRetriever.METADATA_KEY_ARTIST, null);
+        String albumArtist = metadataEditor.getString(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST, null);
+        String album = metadataEditor.getString(MediaMetadataRetriever.METADATA_KEY_ALBUM, null);
+        String track = metadataEditor.getString(MediaMetadataRetriever.METADATA_KEY_TITLE, null);
+
+        //Some music players don't provide the artist tag
+        if (artist == null) {
+            artist = albumArtist;
+        }
+
+        if (artist != null && album != null && track != null) {
+
+            //Pandora add ' (Explicit)' to explicit albums. Remove that.
+            if (album.contains(" (Explicit)")) {
+                album = album.replace(" (Explicit)", "");
+            }
+
+            Intent intent = new Intent(NLService.this, MusicExtensionSource.class);
+            intent.setAction(MusicExtensionUtils.EXTENSION_UPDATE_INTENT);
+            Bundle bundle = new Bundle();
+            bundle.putString("artist", artist);
+            bundle.putString("album", album);
+            bundle.putString("track", track);
+            intent.putExtras(bundle);
+            startService(intent);
+        }
+
     }
+
 }

@@ -8,8 +8,9 @@
     <string name="pref_string_summary_download_wifi_only">Artwork will only be downloaded if a Wi-Fi connection is available</string>
     <string name="pref_string_title_artwork_resolution">Artwork resolution</string>
     <string name="pref_string_summary_artwork_resolution">Choose the resolution of the artwork downloaded from Last.fm</string>
-    <string name="pref_string_title_spotify">Spotify - Notification Access</string>
-    <string name="pref_string_summary_spotify">To enable Spotify support, Muzei Music Extension needs to read Spotify\'s status bar notification. (Android 4.3+)</string>
+    <string name="pref_string_title_notifications">Notification Access</string>
+    <string name="pref_string_summary_notifications">Muzei Music Extension needs permission to access your notifications for Spotify support (Android 4.3+).
+    \n\nThe extension needs the same permission for access to the lockscreen controls for Pandora support and any other music player which doesn\'t work otherwise. (Android 4.4+)</string>
     <string name="pref_size_mega">Large (500px +)</string>
     <string name="pref_size_extra_large">Medium (300px)</string>
     <string name="pref_size_large">Small (175px)</string>
