@@ -14,18 +14,6 @@ public class MyReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-//        Bundle bundle = intent.getExtras();
-//        if (bundle != null) {
-//            Log.d(TAG, "Called by: " + intent.getAction());
-//            for (String key : bundle.keySet()) {
-//                Object value = bundle.get(key);
-//                if (value != null) {
-//                    Log.d(TAG, String.format("%s %s (%s)", key,
-//                            value.toString(), value.getClass().getName()));
-//                }
-//            }
-//        }
-
         Bundle extras = intent.getExtras();
         if (extras != null) {
             final String artistName = extras.getString("artist");

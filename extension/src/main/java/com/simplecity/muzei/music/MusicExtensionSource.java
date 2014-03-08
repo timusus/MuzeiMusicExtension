@@ -88,8 +88,17 @@ public class MusicExtensionSource extends RemoteMuzeiArtSource {
                         MusicExtensionUtils.updateMuzei(this, artistName, albumName, trackName);
                     }
                 }
+
             } else if (intent.getAction().equals(MusicExtensionUtils.EXTENSION_CLEAR_INTENT)) {
-                //Todo: Set a default wallpaper, chosen by the user
+                mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+                if (mPrefs.getBoolean(SettingsActivity.KEY_PREF_USE_DEFAULT_ARTWORK, false)) {
+                    String uriString = mPrefs.getString(MusicExtensionUtils.KEY_DEFAULT_ARTWORK_URI, null);
+                    if (uriString != null) {
+                        publishArtwork(new Artwork.Builder()
+                                .imageUri(Uri.parse(uriString))
+                                .build());
+                    }
+                }
             }
         }
     }

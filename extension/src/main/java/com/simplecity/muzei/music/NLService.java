@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
+import android.media.RemoteControlClient;
 import android.media.RemoteController;
 import android.os.Build;
 import android.os.Bundle;
@@ -65,6 +66,9 @@ public class NLService extends NotificationListenerService implements RemoteCont
         if (statusBarNotification.getPackageName().equals(MusicExtensionUtils.SPOTIFY_PACKAGE_NAME)) {
             List<String> text = getText(statusBarNotification.getNotification());
             if (text == null || text.size() < 3) {
+                Intent intent = new Intent(NLService.this, MusicExtensionSource.class);
+                intent.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
+                startService(intent);
                 return;
             }
             Intent intent = new Intent(this, MusicExtensionSource.class);
@@ -153,18 +157,38 @@ public class NLService extends NotificationListenerService implements RemoteCont
 
     @Override
     public void onClientChange(boolean clearing) {
+        if (clearing) {
+            Intent intent = new Intent(NLService.this, MusicExtensionSource.class);
+            intent.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
+            startService(intent);
+        }
     }
 
     @Override
     public void onClientPlaybackStateUpdate(int state) {
+        if (state != RemoteControlClient.PLAYSTATE_PLAYING) {
+            Intent intent = new Intent(NLService.this, MusicExtensionSource.class);
+            intent.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
+            startService(intent);
+        }
     }
 
     @Override
     public void onClientPlaybackStateUpdate(int state, long stateChangeTimeMs, long currentPosMs, float speed) {
+        if (state != RemoteControlClient.PLAYSTATE_PLAYING) {
+            Intent intent = new Intent(NLService.this, MusicExtensionSource.class);
+            intent.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
+            startService(intent);
+        }
     }
 
     @Override
     public void onClientTransportControlUpdate(int transportControlFlags) {
+        if(transportControlFlags == RemoteControlClient.FLAG_KEY_MEDIA_PAUSE || transportControlFlags == RemoteControlClient.FLAG_KEY_MEDIA_STOP){
+            Intent intent = new Intent(NLService.this, MusicExtensionSource.class);
+            intent.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
+            startService(intent);
+        }
     }
 
     @Override
@@ -195,8 +219,10 @@ public class NLService extends NotificationListenerService implements RemoteCont
             bundle.putString("track", track);
             intent.putExtras(bundle);
             startService(intent);
+        } else {
+            Intent intent = new Intent(NLService.this, MusicExtensionSource.class);
+            intent.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
+            startService(intent);
         }
-
     }
-
 }

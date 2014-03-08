@@ -11,6 +11,10 @@
     <string name="pref_string_title_notifications">Notification Access</string>
     <string name="pref_string_summary_notifications">Muzei Music Extension needs permission to access your notifications for Spotify support (Android 4.3+).
     \n\nThe extension needs the same permission for access to the lockscreen controls for Pandora support and any other music player which doesn\'t work otherwise. (Android 4.4+)</string>
+    <string name="pref_string_title_default_artwork">Default artwork</string>
+    <string name="pref_string_summary_default_artwork">Choose an image from your device, which will display when no music is playing</string>
+    <string name="pref_string_title_use_default_artwork">Use default artwork</string>
+    <string name="pref_string_summary_use_default_artwork">If unchecked, the extension will always display the last album art, even if no music is playing</string>
     <string name="pref_size_mega">Large (500px +)</string>
     <string name="pref_size_extra_large">Medium (300px)</string>
     <string name="pref_size_large">Small (175px)</string>
