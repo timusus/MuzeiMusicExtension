@@ -12,11 +12,15 @@ Muzei Music Extension is on the [Play Store](https://play.google.com/store/apps/
 
 **Changelog:**
 
-Current Version: 1.0.1
+Current Version: 1.0.3
 
-1.0.0
+1.0.3
+- Fix ClassNotFoundException
 
- * Initial release
+1.0.2
+- Added option to choose default artwork (via settings)
+- Added support for Pandora (requires Android 4.4 & notification access)
+- Any music player with lockscreen controls is now supported on Android 4.4, but requires notification access
 
 1.0.1
  * Add support for many more music players, including:
@@ -37,6 +41,10 @@ Current Version: 1.0.1
  * Clicking track info now opens music player chooser
 
  * Some potential performance & bug fixes
+
+1.0.0
+
+ * Initial release
 
 **Developed By**
 
