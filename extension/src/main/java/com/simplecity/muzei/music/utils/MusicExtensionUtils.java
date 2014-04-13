@@ -53,6 +53,9 @@ public class MusicExtensionUtils {
     // Tells the MusicExtensionSource to update itself
     public static final String EXTENSION_CLEAR_INTENT = "com.simplecity.muzei.music.clear";
 
+    //The preference key for the default artwork uri
+    public static final String KEY_DEFAULT_ARTWORK_URI = "default_artwork_uri";
+
     /**
      * Request queue for Volley
      */
@@ -127,7 +130,8 @@ public class MusicExtensionUtils {
                 MediaStore.Audio.Albums.ALBUM + " ='" + albumName.replaceAll("'", "''") + "'"
                         + " AND "
                         + MediaStore.Audio.Albums.ARTIST + " ='" + artistName.replaceAll("'", "''") + "'",
-                null, null);
+                null, null
+        );
 
         if (cursor != null && cursor.moveToFirst()) {
             String artworkPath = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
@@ -158,7 +162,8 @@ public class MusicExtensionUtils {
                 MediaStore.Audio.Albums.ALBUM + " ='" + albumName.replaceAll("'", "''") + "'"
                         + " AND "
                         + MediaStore.Audio.Albums.ARTIST + " ='" + artistName.replaceAll("'", "''") + "'",
-                null, null);
+                null, null
+        );
 
         if (cursor != null && cursor.moveToFirst()) {
             int songId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
@@ -261,7 +266,6 @@ public class MusicExtensionUtils {
                             JSONArray imagesArray = albumObject.getJSONArray("image");
                             boolean megaImageFound = false;
                             boolean extraLargeImageFound = false;
-                            boolean largeImageFound = false;
                             String uri = "";
                             for (int i = 0; i < imagesArray.length(); i++) {
                                 JSONObject sizeObject = imagesArray.getJSONObject(i);
@@ -323,7 +327,8 @@ public class MusicExtensionUtils {
                                                     MediaStore.Audio.Albums.ALBUM + " ='" + albumName.replaceAll("'", "''") + "'"
                                                             + " AND "
                                                             + MediaStore.Audio.Albums.ARTIST + " ='" + artistName.replaceAll("'", "''") + "'",
-                                                    null, null);
+                                                    null, null
+                                            );
 
                                             if (cursor != null && cursor.moveToFirst()) {
                                                 int albumId = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
@@ -456,5 +461,9 @@ public class MusicExtensionUtils {
 
     public static boolean hasJellyBeanMR2() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
+    }
+
+    public static boolean hasKitKat() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
     }
 }

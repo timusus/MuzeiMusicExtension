@@ -1,9 +1,12 @@
 package com.simplecity.muzei.music;
 
-import android.annotation.TargetApi;
 import android.app.Notification;
+import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
+import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
+import android.media.RemoteControlClient;
+import android.media.RemoteController;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -21,11 +24,111 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class NLService extends NotificationListenerService {
 
     private String TAG = this.getClass().getSimpleName();
+
+    private RemoteController mRemoteController;
+
+    @SuppressWarnings("NewApi")
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        if (MusicExtensionUtils.hasKitKat()) {
+
+            RemoteController.OnClientUpdateListener updateListener = new RemoteController.OnClientUpdateListener() {
+                @Override
+                public void onClientChange(boolean clearing) {
+                    if (clearing) {
+                        Intent intent = new Intent(NLService.this, MusicExtensionSource.class);
+                        intent.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
+                        startService(intent);
+                    }
+                }
+
+                @Override
+                public void onClientPlaybackStateUpdate(int state) {
+                    if (state != RemoteControlClient.PLAYSTATE_PLAYING) {
+                        Intent intent = new Intent(NLService.this, MusicExtensionSource.class);
+                        intent.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
+                        startService(intent);
+                    }
+                }
+
+                @Override
+                public void onClientPlaybackStateUpdate(int state, long stateChangeTimeMs, long currentPosMs, float speed) {
+                    if (state != RemoteControlClient.PLAYSTATE_PLAYING) {
+                        Intent intent = new Intent(NLService.this, MusicExtensionSource.class);
+                        intent.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
+                        startService(intent);
+                    }
+                }
+
+                @Override
+                public void onClientTransportControlUpdate(int transportControlFlags) {
+                    if(transportControlFlags == RemoteControlClient.FLAG_KEY_MEDIA_PAUSE || transportControlFlags == RemoteControlClient.FLAG_KEY_MEDIA_STOP){
+                        Intent intent = new Intent(NLService.this, MusicExtensionSource.class);
+                        intent.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
+                        startService(intent);
+                    }
+                }
+
+                @Override
+                public void onClientMetadataUpdate(RemoteController.MetadataEditor metadataEditor) {
+
+                    String artist = metadataEditor.getString(MediaMetadataRetriever.METADATA_KEY_ARTIST, null);
+                    String albumArtist = metadataEditor.getString(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST, null);
+                    String album = metadataEditor.getString(MediaMetadataRetriever.METADATA_KEY_ALBUM, null);
+                    String track = metadataEditor.getString(MediaMetadataRetriever.METADATA_KEY_TITLE, null);
+
+                    //Some music players don't provide the artist tag
+                    if (artist == null) {
+                        artist = albumArtist;
+                    }
+
+                    if (artist != null && album != null && track != null) {
+
+                        //Pandora add ' (Explicit)' to explicit albums. Remove that.
+                        if (album.contains(" (Explicit)")) {
+                            album = album.replace(" (Explicit)", "");
+                        }
+
+                        Intent intent = new Intent(NLService.this, MusicExtensionSource.class);
+                        intent.setAction(MusicExtensionUtils.EXTENSION_UPDATE_INTENT);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("artist", artist);
+                        bundle.putString("album", album);
+                        bundle.putString("track", track);
+                        intent.putExtras(bundle);
+                        startService(intent);
+                    } else {
+                        Intent intent = new Intent(NLService.this, MusicExtensionSource.class);
+                        intent.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
+                        startService(intent);
+                    }
+                }
+            };
+
+
+            mRemoteController = new RemoteController(this, updateListener);
+            mRemoteController.setArtworkConfiguration(1024, 1024);
+            ((AudioManager) getSystemService(Context.AUDIO_SERVICE))
+                    .registerRemoteController(mRemoteController);
+        }
+    }
+
+    @SuppressWarnings("NewApi")
+    @Override
+    public void onDestroy() {
+
+        if (MusicExtensionUtils.hasKitKat()) {
+            ((AudioManager) getSystemService(Context.AUDIO_SERVICE))
+                    .unregisterRemoteController(mRemoteController);
+        }
+
+        super.onDestroy();
+    }
 
     @Override
     public void onNotificationPosted(StatusBarNotification statusBarNotification) {
@@ -33,6 +136,9 @@ public class NLService extends NotificationListenerService {
         if (statusBarNotification.getPackageName().equals(MusicExtensionUtils.SPOTIFY_PACKAGE_NAME)) {
             List<String> text = getText(statusBarNotification.getNotification());
             if (text == null || text.size() < 3) {
+                Intent intent = new Intent(NLService.this, MusicExtensionSource.class);
+                intent.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
+                startService(intent);
                 return;
             }
             Intent intent = new Intent(this, MusicExtensionSource.class);
@@ -118,4 +224,6 @@ public class NLService extends NotificationListenerService {
 
         return text;
     }
+
+
 }

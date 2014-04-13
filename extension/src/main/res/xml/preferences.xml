@@ -13,11 +13,18 @@
         android:summary="@string/pref_string_summary_artwork_resolution"
         android:title="@string/pref_string_title_artwork_resolution" />
     <PreferenceScreen
-        android:key="pref_key_spotify"
-        android:title="@string/pref_string_title_spotify"
-        android:summary="@string/pref_string_summary_spotify">
-
+        android:key="pref_key_notifications"
+        android:summary="@string/pref_string_summary_notifications"
+        android:title="@string/pref_string_title_notifications">
         <intent android:action="android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS" />
-
     </PreferenceScreen>
+    <PreferenceScreen
+        android:key="pref_key_default_artwork"
+        android:summary="@string/pref_string_summary_default_artwork"
+        android:title="@string/pref_string_title_default_artwork" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_key_use_default_artwork"
+        android:summary="@string/pref_string_summary_use_default_artwork"
+        android:title="@string/pref_string_title_use_default_artwork" />
 </PreferenceScreen>
