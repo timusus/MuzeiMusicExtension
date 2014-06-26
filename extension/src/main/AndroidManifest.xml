@@ -63,7 +63,7 @@
 
                 <!-- Samsung  -->
                 <action android:name="com.sec.android.app.music.metachanged" />
-                <action android:name="com.android.music.playstatechanged" />
+                <action android:name="com.sec.android.app.music.playstatechanged" />
 
                 <!-- Rocket Player  -->
                 <action android:name="com.jrtstudio.AnotherMusicPlayer.metachanged" />
