@@ -67,7 +67,7 @@ public class NLService extends NotificationListenerService {
 
                 @Override
                 public void onClientTransportControlUpdate(int transportControlFlags) {
-                    if(transportControlFlags == RemoteControlClient.FLAG_KEY_MEDIA_PAUSE || transportControlFlags == RemoteControlClient.FLAG_KEY_MEDIA_STOP){
+                    if (transportControlFlags == RemoteControlClient.FLAG_KEY_MEDIA_PAUSE || transportControlFlags == RemoteControlClient.FLAG_KEY_MEDIA_STOP) {
                         Intent intent = new Intent(NLService.this, MusicExtensionSource.class);
                         intent.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
                         startService(intent);
@@ -133,14 +133,16 @@ public class NLService extends NotificationListenerService {
     @Override
     public void onNotificationPosted(StatusBarNotification statusBarNotification) {
 
-        if (statusBarNotification.getPackageName().equals(MusicExtensionUtils.SPOTIFY_PACKAGE_NAME)) {
+        if (statusBarNotification.getPackageName().equals(MusicExtensionUtils.SPOTIFY_PACKAGE_NAME) || statusBarNotification.getPackageName().equals(MusicExtensionUtils.SPOTIFY_ALT_PACKAGE_NAME)) {
             List<String> text = getText(statusBarNotification.getNotification());
             if (text == null || text.size() < 3) {
+                Log.d(TAG, "Notification text null");
                 Intent intent = new Intent(NLService.this, MusicExtensionSource.class);
                 intent.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
                 startService(intent);
                 return;
             }
+
             Intent intent = new Intent(this, MusicExtensionSource.class);
             intent.setAction(MusicExtensionUtils.EXTENSION_UPDATE_INTENT);
             Bundle bundle = new Bundle();
