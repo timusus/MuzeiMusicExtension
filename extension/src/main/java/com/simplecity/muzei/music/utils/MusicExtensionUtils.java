@@ -1,5 +1,6 @@
 package com.simplecity.muzei.music.utils;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -342,8 +343,12 @@ public class MusicExtensionUtils {
 
                                                 Uri newuri = musicExtensionSource.getApplicationContext().getContentResolver().insert(Uri.parse("content://media/external/audio/albumart"), values);
                                                 if (newuri == null) {
-                                                    //Failed to insert into the database
-                                                    success = false;
+                                                    //Failed to insert into the database. Attempt to update existing entry (if there is one)
+                                                    newuri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), albumId);
+                                                    if (musicExtensionSource.getApplicationContext().getContentResolver().update(newuri, values, null, null) == 0) {
+                                                        //Failed to insert into the database
+                                                        success = false;
+                                                    }
                                                 }
 
                                                 //If we failed to either save the bitmap on the device, or save it to the database, delete the File we created
