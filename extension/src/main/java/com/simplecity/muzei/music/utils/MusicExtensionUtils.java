@@ -47,9 +47,6 @@ public class MusicExtensionUtils {
     // Used in the notification listener service to determine if notification was filled by Spotify
     public static final String SPOTIFY_PACKAGE_NAME = "com.spotify.mobile.android.ui";
 
-    // Used in the notification listener service to determine if notification was filled by Spotify
-    public static final String SPOTIFY_ALT_PACKAGE_NAME = "com.spotify.music";
-
     // Tells the MusicExtensionSource to update itself
     public static final String EXTENSION_UPDATE_INTENT = "com.simplecity.muzei.music.update";
 
@@ -186,7 +183,7 @@ public class MusicExtensionUtils {
                     cursor.close();
                     return true;
                 }
-            } catch (FileNotFoundException ignored) {
+            } catch (Exception ignored) {
             }
         }
         if (cursor != null) {
