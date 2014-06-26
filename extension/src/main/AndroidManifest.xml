@@ -89,6 +89,12 @@
                 <action android:name="com.e8tracks.playstatechanged" />
                 <action android:name="com.e8tracks.metachanged" />
 
+                <!-- JetAudio (Untested) -->
+                <action android:name="com.jetappfactory.jetaudio.playstatechanged" />
+                <action android:name="com.jetappfactory.jetaudio.metachanged" />
+                <action android:name="com.jetappfactory.jetaudioplus.playstatechanged" />
+                <action android:name="com.jetappfactory.jetaudioplus.metachanged" />
+
             </intent-filter>
         </receiver>
 
