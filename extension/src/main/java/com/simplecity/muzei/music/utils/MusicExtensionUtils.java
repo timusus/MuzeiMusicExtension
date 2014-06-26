@@ -93,7 +93,7 @@ public class MusicExtensionUtils {
                 return;
             }
 
-            //Log.d(TAG, "Update from MediaStore failed, attempting to retrieve from Last.fm");
+            Log.d(TAG, "Update from MediaStore failed, attempting to retrieve from Last.fm");
             updateFromLastFM(musicExtensionSource, artistName, albumName, trackName);
         }
     }
@@ -139,11 +139,13 @@ public class MusicExtensionUtils {
         if (cursor != null && cursor.moveToFirst()) {
             String artworkPath = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
             if (artworkPath != null) {
-                Uri uri = Uri.fromFile(new File(artworkPath));
-                //Log.i(TAG, "Artwork found @ " + uri);
-                musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
-                cursor.close();
-                return true;
+                File file = new File(artworkPath);
+                if (file.exists()) {
+                    Uri uri = Uri.fromFile(new File(artworkPath));
+                    musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
+                    cursor.close();
+                    return true;
+                }
             }
         }
 
@@ -152,7 +154,7 @@ public class MusicExtensionUtils {
         }
 
         //2. Try to find the artwork in the MediaStore based on the trackId instead of the albumId
-        //Log.d(TAG, "Attempting to retrieve artwork from MediaStore _ID column");
+        Log.d(TAG, "Attempting to retrieve artwork from MediaStore _ID column");
         projection = new String[]{
                 MediaStore.Audio.Media._ID,
                 MediaStore.Audio.Media.DATA,
@@ -177,7 +179,7 @@ public class MusicExtensionUtils {
                 pfd = musicExtensionSource.getApplicationContext().getContentResolver().openFileDescriptor(uri, "r");
                 if (pfd != null) {
                     //The artwork exists at this uri
-                    //Log.d("MusicExtensionUtils", "Artwork found @ " + uri);
+                    Log.d("MusicExtensionUtils", "2 Artwork found @ " + uri);
                     musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
                     try {
                         pfd.close();
@@ -194,7 +196,7 @@ public class MusicExtensionUtils {
         }
 
         // 3. Try to find the artwork within the folder
-        //Log.d(TAG, "Attempting to retrieve artwork from folder");
+        Log.d(TAG, "Attempting to retrieve artwork from folder");
 
         //Todo: Check other common paths/filetypes
 
@@ -205,7 +207,6 @@ public class MusicExtensionUtils {
                 File file = new File(artworkPath);
                 if (file.exists()) {
                     Uri uri = Uri.fromFile(file);
-                    //Log.d("MusicExtensionUtils", "Artwork found @ " + uri);
                     musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
                     return true;
                 } else {
@@ -213,7 +214,6 @@ public class MusicExtensionUtils {
                     file = new File(artworkPath);
                     if (file.exists()) {
                         Uri uri = Uri.fromFile(file);
-                        //Log.d("MusicExtensionUtils", "Artwork found @ " + uri);
                         musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
                         return true;
                     }
