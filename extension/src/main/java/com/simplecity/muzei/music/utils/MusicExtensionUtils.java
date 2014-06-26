@@ -345,6 +345,7 @@ public class MusicExtensionUtils {
 
                                                 //If we failed to either save the bitmap on the device, or save it to the database, delete the File we created
                                                 if (!success) {
+                                                    Log.e(TAG, "Database insertion failed");
                                                     File f = new File(savePath);
                                                     f.delete();
                                                 }
