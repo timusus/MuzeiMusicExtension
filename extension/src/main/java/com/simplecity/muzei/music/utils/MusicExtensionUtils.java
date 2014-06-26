@@ -38,6 +38,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -198,20 +199,30 @@ public class MusicExtensionUtils {
         // 3. Try to find the artwork within the folder
         //Log.d(TAG, "Attempting to retrieve artwork from folder");
 
-        //Todo: Check other common paths/filetypes
-
         if (path != null) {
             int lastSlash = path.lastIndexOf('/');
             if (lastSlash > 0) {
-                String artworkPath = path.substring(0, lastSlash + 1) + "AlbumArt.jpg";
-                File file = new File(artworkPath);
-                if (file.exists()) {
-                    Uri uri = Uri.fromFile(file);
-                    musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
-                    return true;
-                } else {
-                    artworkPath = path.substring(0, lastSlash + 1) + "Folder.jpg";
-                    file = new File(artworkPath);
+                ArrayList<String> paths = new ArrayList<String>();
+                String subString = path.substring(0, lastSlash + 1);
+                paths.add(subString + "AlbumArt.jpg");
+                paths.add(subString + "albumart.jpg");
+                paths.add(subString + "AlbumArt.png");
+                paths.add(subString + "albumart.png");
+                paths.add(subString + "Folder.jpg");
+                paths.add(subString + "folder.jpg");
+                paths.add(subString + "Folder.png");
+                paths.add(subString + "folder.png");
+                paths.add(subString + "Cover.jpg");
+                paths.add(subString + "cover.jpg");
+                paths.add(subString + "Cover.png");
+                paths.add(subString + "cover.png");
+                paths.add(subString + "Album.jpg");
+                paths.add(subString + "album.jpg");
+                paths.add(subString + "Album.png");
+                paths.add(subString + "album.png");
+
+                for (String artworkPath : paths) {
+                    File file = new File(artworkPath);
                     if (file.exists()) {
                         Uri uri = Uri.fromFile(file);
                         musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
