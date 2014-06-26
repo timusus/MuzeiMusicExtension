@@ -12,10 +12,17 @@ Muzei Music Extension is on the [Play Store](https://play.google.com/store/apps/
 
 **Changelog:**
 
-Current Version: 1.0.3
+Current Version: 1.0.4
+
+1.0.4
+- Added support for new Spotify app
+- Added support for jetAudio Music Player & jetAudio Music Player Plus (both untested)
+- Various minor bug fixes
+- Fix issue where artwork wouldn't download if a MediaStore album art entry was present in the MediaStore (even if that entry pointed to a file that didn't exist)
+- Add more paths to search from on device (*.png locations, cover.* & album.*)
 
 1.0.3
-- Fix ClassNotFoundException
+- Fixed ClassNotFoundException
 
 1.0.2
 - Added option to choose default artwork (via settings)
