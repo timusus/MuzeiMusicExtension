@@ -1,6 +1,7 @@
 package com.simplecity.muzei.music;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -60,8 +61,12 @@ public class SettingsActivity extends PreferenceActivity {
                 defaultArtworkPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                     @Override
                     public boolean onPreferenceClick(Preference preference) {
-                        Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                        startActivityForResult(intent, PICK_IMAGE);
+                        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        try {
+                            startActivityForResult(intent, PICK_IMAGE);
+                        } catch (ActivityNotFoundException ignored) {
+                            //Do nothing
+                        }
                         return true;
                     }
                 });
