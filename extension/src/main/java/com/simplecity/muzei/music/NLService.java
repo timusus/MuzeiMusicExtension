@@ -1,12 +1,17 @@
 package com.simplecity.muzei.music;
 
 import android.app.Notification;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
+import android.media.MediaMetadata;
 import android.media.MediaMetadataRetriever;
 import android.media.RemoteControlClient;
 import android.media.RemoteController;
+import android.media.session.MediaController;
+import android.media.session.MediaSessionManager;
+import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -16,6 +21,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import com.simplecity.muzei.music.utils.Constants;
 import com.simplecity.muzei.music.utils.MusicExtensionUtils;
 
 import java.lang.reflect.Field;
@@ -30,12 +36,16 @@ public class NLService extends NotificationListenerService {
 
     private RemoteController mRemoteController;
 
+    private MediaController mMediaController;
+
+    private MediaController.Callback mMediaControllerCallback;
+
     @SuppressWarnings("NewApi")
     @Override
     public void onCreate() {
         super.onCreate();
 
-        if (MusicExtensionUtils.hasKitKat()) {
+        if (MusicExtensionUtils.hasKitKat() && !MusicExtensionUtils.hasLollipop()) {
 
             RemoteController.OnClientUpdateListener updateListener = new RemoteController.OnClientUpdateListener() {
                 @Override
@@ -97,9 +107,9 @@ public class NLService extends NotificationListenerService {
                         Intent intent = new Intent(NLService.this, MusicExtensionSource.class);
                         intent.setAction(MusicExtensionUtils.EXTENSION_UPDATE_INTENT);
                         Bundle bundle = new Bundle();
-                        bundle.putString("artist", artist);
-                        bundle.putString("album", album);
-                        bundle.putString("track", track);
+                        bundle.putString(Constants.KEY_ARTIST, artist);
+                        bundle.putString(Constants.KEY_ALBUM, album);
+                        bundle.putString(Constants.KEY_TRACK, track);
                         intent.putExtras(bundle);
                         startService(intent);
                     } else {
@@ -110,21 +120,60 @@ public class NLService extends NotificationListenerService {
                 }
             };
 
-
             mRemoteController = new RemoteController(this, updateListener);
             mRemoteController.setArtworkConfiguration(1024, 1024);
             ((AudioManager) getSystemService(Context.AUDIO_SERVICE))
                     .registerRemoteController(mRemoteController);
         }
+
+        if (MusicExtensionUtils.hasLollipop()) {
+
+            mMediaControllerCallback = new MediaController.Callback() {
+                @Override
+                public void onPlaybackStateChanged(PlaybackState state) {
+                    if (state.getState() == PlaybackState.STATE_STOPPED
+                            || state.getState() == PlaybackState.STATE_PAUSED
+                            || state.getState() == PlaybackState.STATE_ERROR) {
+                        Intent intent = new Intent(NLService.this, MusicExtensionSource.class);
+                        intent.setAction(MusicExtensionUtils.EXTENSION_UPDATE_INTENT);
+                        startService(intent);
+                    }
+                }
+
+                @Override
+                public void onMetadataChanged(MediaMetadata metadata) {
+                    Intent intent = new Intent(NLService.this, MusicExtensionSource.class);
+                    intent.setAction(MusicExtensionUtils.EXTENSION_UPDATE_INTENT);
+                    Bundle bundle = new Bundle();
+                    bundle.putString(Constants.KEY_TRACK, metadata.getString(MediaMetadata.METADATA_KEY_TITLE));
+                    bundle.putString(Constants.KEY_ALBUM, metadata.getString(MediaMetadata.METADATA_KEY_ALBUM));
+                    bundle.putString(Constants.KEY_ARTIST, metadata.getString(MediaMetadata.METADATA_KEY_ARTIST));
+                    intent.putExtras(bundle);
+                    startService(intent);
+                }
+            };
+
+            MediaSessionManager mediaSessionManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
+            List<MediaController> mediaControllers = mediaSessionManager.getActiveSessions(new ComponentName(this, NLService.class));
+            if (mediaControllers != null && mediaControllers.size() != 0) {
+                mMediaController = mediaControllers.get(0);
+                mMediaController.registerCallback(mMediaControllerCallback);
+            }
+        }
+
     }
 
     @SuppressWarnings("NewApi")
     @Override
     public void onDestroy() {
 
-        if (MusicExtensionUtils.hasKitKat()) {
+        if (MusicExtensionUtils.hasKitKat() && !MusicExtensionUtils.hasLollipop()) {
             ((AudioManager) getSystemService(Context.AUDIO_SERVICE))
                     .unregisterRemoteController(mRemoteController);
+        }
+
+        if (MusicExtensionUtils.hasLollipop()) {
+            mMediaController.unregisterCallback(mMediaControllerCallback);
         }
 
         super.onDestroy();
@@ -146,9 +195,9 @@ public class NLService extends NotificationListenerService {
             Intent intent = new Intent(this, MusicExtensionSource.class);
             intent.setAction(MusicExtensionUtils.EXTENSION_UPDATE_INTENT);
             Bundle bundle = new Bundle();
-            bundle.putString("track", text.get(0));
-            bundle.putString("album", text.get(1));
-            bundle.putString("artist", text.get(2));
+            bundle.putString(Constants.KEY_TRACK, text.get(0));
+            bundle.putString(Constants.KEY_ALBUM, text.get(1));
+            bundle.putString(Constants.KEY_ARTIST, text.get(2));
             intent.putExtras(bundle);
             startService(intent);
         }

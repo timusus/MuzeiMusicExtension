@@ -55,7 +55,7 @@ public class MusicExtensionUtils {
     // Tells the MusicExtensionSource to update itself
     public static final String EXTENSION_UPDATE_INTENT = "com.simplecity.muzei.music.update";
 
-    // Tells the MusicExtensionSource to update itself
+    // Tells the MusicExtensionSource to clear itself
     public static final String EXTENSION_CLEAR_INTENT = "com.simplecity.muzei.music.clear";
 
     //The preference key for the default artwork uri
@@ -143,7 +143,7 @@ public class MusicExtensionUtils {
             if (artworkPath != null) {
                 File file = new File(artworkPath);
                 if (file.exists()) {
-                    Uri uri = Uri.fromFile(new File(artworkPath));
+                    Uri uri = Uri.fromFile(file);
                     musicExtensionSource.publishArtwork(artistName, albumName, trackName, uri);
                     cursor.close();
                     return true;
@@ -484,5 +484,9 @@ public class MusicExtensionUtils {
 
     public static boolean hasKitKat() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+    }
+
+    public static boolean hasLollipop() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     }
 }

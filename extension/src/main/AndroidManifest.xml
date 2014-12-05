@@ -96,6 +96,10 @@
                 <action android:name="com.jetappfactory.jetaudioplus.playstatechanged" />
                 <action android:name="com.jetappfactory.jetaudioplus.metachanged" />
 
+                <!-- SoundCloud (Untested) -->
+                <action android:name="com.soundcloud.android.playstatechanged" />
+                <action android:name="com.soundcloud.android.metachanged" />
+
             </intent-filter>
         </receiver>
 

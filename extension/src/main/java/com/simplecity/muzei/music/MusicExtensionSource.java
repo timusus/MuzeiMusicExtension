@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 
 import com.google.android.apps.muzei.api.Artwork;
 import com.google.android.apps.muzei.api.RemoteMuzeiArtSource;
+import com.simplecity.muzei.music.utils.Constants;
 import com.simplecity.muzei.music.utils.MusicExtensionUtils;
 
 public class MusicExtensionSource extends RemoteMuzeiArtSource {
@@ -81,9 +82,9 @@ public class MusicExtensionSource extends RemoteMuzeiArtSource {
             if (intent.getAction().equals(MusicExtensionUtils.EXTENSION_UPDATE_INTENT)) {
                 Bundle extras = intent.getExtras();
                 if (extras != null) {
-                    final String artistName = extras.getString("artist");
-                    final String albumName = extras.getString("album");
-                    final String trackName = extras.getString("track");
+                    final String artistName = extras.getString(Constants.KEY_ARTIST);
+                    final String albumName = extras.getString(Constants.KEY_ALBUM);
+                    final String trackName = extras.getString(Constants.KEY_TRACK);
                     if (artistName != null && albumName != null && trackName != null) {
                         MusicExtensionUtils.updateMuzei(this, artistName, albumName, trackName);
                     }

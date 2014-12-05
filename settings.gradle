@@ -1,1 +1,1 @@
-include ':api', ':extension'
+include ':extension'
