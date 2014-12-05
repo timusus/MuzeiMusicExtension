@@ -12,7 +12,15 @@ Muzei Music Extension is on the [Play Store](https://play.google.com/store/apps/
 
 **Changelog:**
 
-Current Version: 1.0.4
+Current Version: 1.0.5
+
+1.0.5
+- Remove 'api' folder & reference maven repo for API dependency.
+- Use 'MediaController' on Android 5.0 for retrieving metadata from NL Service
+- Update gradle build version
+- Minor tidy up
+- Add untested support for SoundCloud (assuming they use a fairly standard intent for media updates)
+- Version bump
 
 1.0.4
 - Added support for new Spotify app
