@@ -9,10 +9,7 @@ public class MusicExtensionApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        //Todo: Switch to false for release version
-        boolean debug = false;
-
-        if (debug && BuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG) {
 
             StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
                     .detectAll()
