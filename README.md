@@ -12,7 +12,13 @@ Muzei Music Extension is on the [Play Store](https://play.google.com/store/apps/
 
 **Changelog:**
 
-Current Version: 1.0.5
+Current Version: 1.0.6
+
+1.0.6
+- Fixed a crash occurring when toggling notification settings
+- Fixed an issue where default artwork wasn't working
+- Possible support for Apple music (untested)
+- Various minor changes
 
 1.0.5
 - Remove 'api' folder & reference maven repo for API dependency.
