@@ -246,7 +246,7 @@ public class MusicExtensionUtils {
     private static void updateFromLastFM(final MusicExtensionSource musicExtensionSource,
                                          final String artistName, final String albumName, final String trackName) {
 
-        //Cancel any prending Volley requests, as we don't care about the previous track anymore.
+        //Cancel any pending Volley requests, as we don't care about the previous track anymore.
         cancelPendingRequests();
 
         if (albumName.equals(MediaStore.UNKNOWN_STRING)) {
