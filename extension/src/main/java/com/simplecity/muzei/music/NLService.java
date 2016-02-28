@@ -172,7 +172,7 @@ public class NLService extends NotificationListenerService {
                     .unregisterRemoteController(mRemoteController);
         }
 
-        if (MusicExtensionUtils.hasLollipop()) {
+        if (MusicExtensionUtils.hasLollipop() && mMediaController != null) {
             mMediaController.unregisterCallback(mMediaControllerCallback);
         }
 
