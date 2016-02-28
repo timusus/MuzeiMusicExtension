@@ -58,9 +58,6 @@ public class MusicExtensionUtils {
     // Tells the MusicExtensionSource to clear itself
     public static final String EXTENSION_CLEAR_INTENT = "com.simplecity.muzei.music.clear";
 
-    //The preference key for the default artwork uri
-    public static final String KEY_DEFAULT_ARTWORK_URI = "default_artwork_uri";
-
     /**
      * Request queue for Volley
      */

@@ -5,12 +5,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 
 import com.google.android.apps.muzei.api.Artwork;
 import com.google.android.apps.muzei.api.RemoteMuzeiArtSource;
 import com.simplecity.muzei.music.utils.Constants;
 import com.simplecity.muzei.music.utils.MusicExtensionUtils;
+
+import java.io.File;
 
 public class MusicExtensionSource extends RemoteMuzeiArtSource {
 
@@ -91,12 +94,17 @@ public class MusicExtensionSource extends RemoteMuzeiArtSource {
                 }
 
             } else if (intent.getAction().equals(MusicExtensionUtils.EXTENSION_CLEAR_INTENT)) {
+
                 mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
                 if (mPrefs.getBoolean(SettingsActivity.KEY_PREF_USE_DEFAULT_ARTWORK, false)) {
-                    String uriString = mPrefs.getString(MusicExtensionUtils.KEY_DEFAULT_ARTWORK_URI, null);
-                    if (uriString != null) {
+                    File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "default_wallpaper.jpg");
+                    if (file.exists()) {
                         publishArtwork(new Artwork.Builder()
-                                .imageUri(Uri.parse(uriString))
+                                .imageUri(Uri.fromFile(file))
+                                .build());
+                    } else {
+                        publishArtwork(new Artwork.Builder()
+                                .imageUri(null)
                                 .build());
                     }
                 }

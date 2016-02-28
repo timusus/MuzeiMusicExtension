@@ -2,17 +2,25 @@ package com.simplecity.muzei.music;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 import android.view.MenuItem;
 
 import com.simplecity.muzei.music.utils.MusicExtensionUtils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class SettingsActivity extends PreferenceActivity {
 
@@ -62,6 +70,8 @@ public class SettingsActivity extends PreferenceActivity {
                     @Override
                     public boolean onPreferenceClick(Preference preference) {
                         Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                        intent.setType("image/*");
                         try {
                             startActivityForResult(intent, PICK_IMAGE);
                         } catch (ActivityNotFoundException ignored) {
@@ -82,8 +92,27 @@ public class SettingsActivity extends PreferenceActivity {
                 Uri selectedImageURI = data.getData();
 
                 if (selectedImageURI != null) {
-                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
-                    prefs.edit().putString(MusicExtensionUtils.KEY_DEFAULT_ARTWORK_URI, selectedImageURI.toString()).apply();
+
+                    if (selectedImageURI.getAuthority() != null) {
+                        InputStream inputStream = null;
+                        try {
+                            inputStream = getActivity().getContentResolver().openInputStream(selectedImageURI);
+                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                            if (bitmap != null) {
+                                saveImageToFile(getActivity(), bitmap);
+                            }
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } finally {
+                            if (inputStream != null) {
+                                try {
+                                    inputStream.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -95,5 +124,30 @@ public class SettingsActivity extends PreferenceActivity {
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    public static void saveImageToFile(Context context, Bitmap bitmap) {
+
+        File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "default_wallpaper.jpg");
+        if (file.exists()) {
+            file.delete();
+        }
+
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, fileOutputStream);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            if (fileOutputStream != null) {
+                try {
+                    fileOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }
