@@ -22,20 +22,21 @@ public class MyReceiver extends BroadcastReceiver {
             final String trackName = extras.getString(Constants.KEY_TRACK);
 
             if (artistName != null && albumName != null && trackName != null) {
-                Intent intent1 = new Intent(context, MusicExtensionSource.class);
-                intent1.setAction(MusicExtensionUtils.EXTENSION_UPDATE_INTENT);
-                intent1.putExtra(Constants.KEY_ARTIST, artistName);
-                intent1.putExtra(Constants.KEY_ALBUM, albumName);
-                intent1.putExtra(Constants.KEY_TRACK, trackName);
-                context.startService(intent1);
+                Intent updateIntent = new Intent(context, MusicExtensionSource.class);
+                updateIntent.setAction(MusicExtensionUtils.EXTENSION_UPDATE_INTENT);
+                updateIntent.putExtra(Constants.KEY_ARTIST, artistName);
+                updateIntent.putExtra(Constants.KEY_ALBUM, albumName);
+                updateIntent.putExtra(Constants.KEY_TRACK, trackName);
+                context.startService(updateIntent);
             }
 
             if (extras.containsKey("playing")) {
                 if (!extras.getBoolean("playing", true)) {
+
                     //The song has been paused. Set the Muzei artwork to something else.
-                    Intent intent1 = new Intent(context, MusicExtensionSource.class);
-                    intent1.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
-                    context.startService(intent1);
+                    Intent clearIntent = new Intent(context, MusicExtensionSource.class);
+                    clearIntent.setAction(MusicExtensionUtils.EXTENSION_CLEAR_INTENT);
+                    context.startService(clearIntent);
                 }
             }
         }
