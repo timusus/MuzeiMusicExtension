@@ -6,6 +6,7 @@ repositories {
 
 dependencies {
     compile 'com.google.android.apps.muzei:muzei-api:2.0'
+    compile 'com.android.volley:volley:1.0.0'
 }
 
 android {
