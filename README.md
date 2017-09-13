@@ -12,7 +12,15 @@ Muzei Music Extension is on the [Play Store](https://play.google.com/store/apps/
 
 **Changelog:**
 
-Current Version: 1.0.6
+Current Version: 2.0
+
+2.0
+- Migrated to Kotlin
+- Migrated from Volley to Retrofit
+- Use Dagger for injecting network related modules
+- Use regex when performing folder search, covers more artwork naming possibilities
+- Fixed an issue where Muzei didn't have permission to access artwork Uris (using StreamProvider)
+- Added SetupActivity, which requests for necessary permissions (write external storage)
 
 1.0.6
 - Fixed a crash occurring when toggling notification settings

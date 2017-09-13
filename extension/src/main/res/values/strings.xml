@@ -3,6 +3,7 @@
     <string name="source_name">Music</string>
     <string name="source_description">Album artwork from your music library</string>
     <string name="title_settings">Settings</string>
+    <string name="title_setup">Setup</string>
 
     <string name="pref_string_title_download_wifi_only">Download via Wi-Fi only</string>
     <string name="pref_string_summary_download_wifi_only">Artwork will only be downloaded if a Wi-Fi connection is available</string>

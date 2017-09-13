@@ -4,14 +4,6 @@
         android:key="pref_key_wifi_only"
         android:summary="@string/pref_string_summary_download_wifi_only"
         android:title="@string/pref_string_title_download_wifi_only" />
-    <ListPreference
-        android:defaultValue="0"
-        android:dialogTitle="@string/pref_string_title_artwork_resolution"
-        android:entries="@array/pref_size_options_array"
-        android:entryValues="@array/pref_size_values_array"
-        android:key="pref_key_resolution"
-        android:summary="@string/pref_string_summary_artwork_resolution"
-        android:title="@string/pref_string_title_artwork_resolution" />
     <PreferenceScreen
         android:key="pref_key_notifications"
         android:summary="@string/pref_string_summary_notifications"

@@ -1,60 +1,110 @@
+import org.jetbrains.annotations.Nullable
+
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 repositories {
     mavenCentral()
+
+    maven {
+        url "https://s3.amazonaws.com/repo.commonsware.com"
+    }
+
+    google()
+}
+
+@Nullable
+def getProperties(String fileName) {
+    final Properties properties = new Properties()
+    def file = file(fileName)
+    if (file.exists()) {
+        file.withInputStream { stream -> properties.load(stream) }
+    }
+    return properties
+}
+
+static def getProperty(@Nullable Properties properties, String name) {
+    return properties.getProperty(name) ?: "$name missing"
 }
 
 dependencies {
-    compile 'com.google.android.apps.muzei:muzei-api:2.0'
-    compile 'com.android.volley:volley:1.0.0'
+
+    // Muzei API
+    implementation 'com.google.android.apps.muzei:muzei-api:2.0'
+
+    // Support libs
+    implementation "com.android.support:appcompat-v7:25.4.0"
+
+    // Stream provider
+    implementation 'com.commonsware.cwac:provider:0.5.2'
+
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+
+    // OKHttp
+    implementation 'com.squareup.okhttp3:okhttp:3.8.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.6.0'
+
+    // Dagger
+    implementation 'com.google.dagger:dagger:2.11'
+    kapt 'com.google.dagger:dagger-compiler:2.11'
 }
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "23.0.2"
-
-    def Properties versionProps = new Properties()
-    versionProps.load(new FileInputStream(file('version.properties')))
+    compileSdkVersion 25
+    buildToolsVersion '25.0.3'
 
     defaultConfig {
         minSdkVersion 17
-        targetSdkVersion 22
+        targetSdkVersion 25
 
-        versionName versionProps['name']
-        versionCode versionProps['code'].toInteger()
+        versionName '2.0'
+        versionCode gitCommitCount()
+
+        buildConfigField "String", "PROXY_IP", "\"\""
+        buildConfigField "boolean", "PROXY_ENABLED", "false"
     }
 
     signingConfigs {
         release {
-            File keystoreFile = file('../keystore.properties')
-            if (keystoreFile.exists()) {
-                def Properties keyProps = new Properties()
-                keyProps.load(new FileInputStream(keystoreFile))
-                storeFile keyProps["store"] != null ? file(keyProps["store"]) : null
-                keyAlias keyProps["alias"]
-                storePassword keyProps["storePass"]
-                keyPassword keyProps["pass"]
-            }
+            Properties properties = getProperties('../keystore.properties')
+            storeFile file(getProperty(properties, 'store'))
+            keyAlias getProperty(properties, 'alias')
+            storePassword getProperty(properties, 'storePass')
+            keyPassword getProperty(properties, 'pass')
         }
     }
 
     buildTypes {
+        debug {
+            buildConfigField "boolean", "PROXY_ENABLED", "false"
+            buildConfigField "String", "PROXY_IP", "\"192.168.0.3\""
+        }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), file('proguard-project.txt')
             signingConfig signingConfigs.release
         }
+    }
+}
 
-        applicationVariants.all { variant ->
-            variant.outputs.each { output ->
-                def outputFile = output.outputFile
-                if (outputFile != null && outputFile.name.endsWith('.apk')) {
-                    def fileName = outputFile.name.replace('.apk', "-${versionName}.apk")
-                    output.outputFile = new File(outputFile.parent, fileName)
-                }
-            }
+def gitCommitCount() {
+    def commitCount = 0
+    try {
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'rev-list', '--all', '--count'
+            standardOutput stdout
         }
+        commitCount = stdout.toString().trim().toInteger()
     }
-    compileOptions {
+    catch (error) {
+        println "Error: ${error}"
     }
+    return commitCount
 }
