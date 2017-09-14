@@ -69,6 +69,11 @@
                 <!-- Samsung  -->
                 <action android:name="com.sec.android.app.music.metachanged"/>
                 <action android:name="com.sec.android.app.music.playstatechanged"/>
+                <action android:name="com.samsung.MusicPlayer.metachanged" />
+                <action android:name="com.samsung.sec.metachanged" />
+                <action android:name="com.samsung.music.metachanged" />
+                <action android:name="com.samsung.sec.android.MusicPlayer.metachanged" />
+                <action android:name="com.samsung.sec.android.MusicPlayer.playstatechanged" />
 
                 <!-- Rocket Player  -->
                 <action android:name="com.jrtstudio.AnotherMusicPlayer.metachanged"/>
@@ -99,6 +104,8 @@
                 <action android:name="com.jetappfactory.jetaudio.metachanged"/>
                 <action android:name="com.jetappfactory.jetaudioplus.playstatechanged"/>
                 <action android:name="com.jetappfactory.jetaudioplus.metachanged"/>
+                <action android:name="com.jrtstudio.AnotherMusicPlayer.metachanged" />
+                <action android:name="com.jrtstudio.AnotherMusicPlayer.playstatechanged" />
 
                 <!-- SoundCloud (Untested) -->
                 <action android:name="com.soundcloud.android.playstatechanged"/>
@@ -111,6 +118,22 @@
                 <!-- Spotify -->
                 <action android:name="com.spotify.music.playbackstatechanged"/>
                 <action android:name="com.spotify.music.metachanged"/>
+
+                <!-- Amazon -->
+                <action android:name="com.spotify.music.metadatachanged" />
+                <action android:name="com.spotify.music.playbackstatechanged" />
+
+                <!-- Apollo -->
+                <action android:name="com.andrew.apollo.metachanged" />
+                <action android:name="com.andrew.apollo.playstatechanged" />
+
+                <!-- PowerAmp -->
+                <action android:name="com.maxmpz.audioplayer.metachanged" />
+                <action android:name="com.maxmpz.audioplayer.playstatechanged" />
+
+                <!-- Music Flow Player-->
+                <action android:name="com.lge.music.metachanged" />
+                <action android:name="com.lge.music.playstatechanged" />
 
             </intent-filter>
         </receiver>
