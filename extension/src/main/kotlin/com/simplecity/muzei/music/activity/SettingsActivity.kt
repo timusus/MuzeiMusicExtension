@@ -13,8 +13,8 @@ import android.preference.PreferenceActivity
 import android.preference.PreferenceFragment
 import android.view.MenuItem
 import com.simplecity.muzei.music.R
-import com.simplecity.muzei.music.utils.VersionUtils
-import java.io.*
+import java.io.File
+import java.io.FileOutputStream
 
 class SettingsActivity : PreferenceActivity() {
 
@@ -23,7 +23,6 @@ class SettingsActivity : PreferenceActivity() {
         private val PICK_IMAGE = 100
 
         const val KEY_PREF_WIFI_ONLY = "pref_key_wifi_only"
-        const val KEY_PREF_NOTIFICATIONS = "pref_key_notifications"
         const val KEY_PREF_DEFAULT_ARTWORK = "pref_key_default_artwork"
         const val KEY_PREF_USE_DEFAULT_ARTWORK = "pref_key_use_default_artwork"
     }
@@ -31,30 +30,20 @@ class SettingsActivity : PreferenceActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Display the preference fragment as the main content.
-        fragmentManager.beginTransaction().setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
-                .replace(android.R.id.content, Prefs1Fragment())
+        fragmentManager.beginTransaction()
+                .setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
+                .replace(android.R.id.content, PrefsFragment())
                 .commit()
     }
 
-    class Prefs1Fragment : PreferenceFragment() {
+    class PrefsFragment : PreferenceFragment() {
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
 
-            // Load the preferences from an XML resource
             addPreferencesFromResource(R.xml.preferences)
 
-            //Disable the Spotify notification access preference on API < 4.3 (Notification Listener Service not available)
-            if (!VersionUtils.hasJellyBeanMR2()) {
-                val spotifyPreference = findPreference(KEY_PREF_NOTIFICATIONS)
-                if (spotifyPreference != null) {
-                    spotifyPreference.isEnabled = false
-                }
-            }
-
-            val defaultArtworkPreference = findPreference(KEY_PREF_DEFAULT_ARTWORK)
-            if (defaultArtworkPreference != null) {
+            findPreference(KEY_PREF_DEFAULT_ARTWORK)?.let { defaultArtworkPreference ->
                 defaultArtworkPreference.onPreferenceClickListener = Preference.OnPreferenceClickListener {
                     val intent = Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                     intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true)
@@ -74,28 +63,14 @@ class SettingsActivity : PreferenceActivity() {
 
             if (resultCode == Activity.RESULT_OK && requestCode == PICK_IMAGE && data != null) {
 
-                val selectedImageURI = data.data
+                val selectedImageUri = data.data
 
-                if (selectedImageURI != null) {
-
-                    if (selectedImageURI.authority != null) {
-                        var inputStream: InputStream? = null
-                        try {
-                            inputStream = activity.contentResolver.openInputStream(selectedImageURI)
+                if (selectedImageUri != null) {
+                    if (selectedImageUri.authority != null) {
+                        activity.contentResolver.openInputStream(selectedImageUri).use { inputStream ->
                             val bitmap = BitmapFactory.decodeStream(inputStream)
                             if (bitmap != null) {
                                 saveImageToFile(activity, bitmap)
-                            }
-                        } catch (e: FileNotFoundException) {
-                            e.printStackTrace()
-                        } finally {
-                            if (inputStream != null) {
-                                try {
-                                    inputStream.close()
-                                } catch (e: IOException) {
-                                    e.printStackTrace()
-                                }
-
                             }
                         }
                     }
@@ -109,20 +84,8 @@ class SettingsActivity : PreferenceActivity() {
                 file.delete()
             }
 
-            var fileOutputStream: FileOutputStream? = null
-            try {
-                fileOutputStream = FileOutputStream(file)
+            FileOutputStream(file).use { fileOutputStream ->
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 80, fileOutputStream)
-            } catch (e: FileNotFoundException) {
-                e.printStackTrace()
-            } finally {
-                if (fileOutputStream != null) {
-                    try {
-                        fileOutputStream.close()
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
-                }
             }
         }
     }

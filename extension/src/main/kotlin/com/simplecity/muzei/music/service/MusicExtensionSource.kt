@@ -4,6 +4,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import android.preference.PreferenceManager
+import android.util.Log
+import com.commonsware.cwac.provider.StreamProvider
 import com.google.android.apps.muzei.api.Artwork
 import com.google.android.apps.muzei.api.MuzeiArtSource
 import com.google.android.apps.muzei.api.RemoteMuzeiArtSource
@@ -12,6 +14,7 @@ import com.simplecity.muzei.music.MusicExtensionApplication
 import com.simplecity.muzei.music.R
 import com.simplecity.muzei.music.activity.SettingsActivity
 import com.simplecity.muzei.music.artwork.ArtworkProvider
+import com.simplecity.muzei.music.model.Track
 import java.io.File
 import javax.inject.Inject
 
@@ -36,24 +39,19 @@ class MusicExtensionSource : RemoteMuzeiArtSource("MusicExtensionSource") {
 
     /**
      * Publishes the [com.google.android.apps.muzei.api.Artwork] to Muzei
-     *
-     * @param artistName the name of the artist
-     * @param albumName  the name of the album
-     * @param trackName  the name of the song
-     * @param uri        the [android.net.Uri] to the album art
      */
-    fun publishArtwork(artistName: String, albumName: String, trackName: String, uri: Uri?) {
+    fun publishArtwork(track: Track, uri: Uri?) {
         publishArtwork(Artwork.Builder()
-                .title(trackName)
-                .byline("$artistName - $albumName")
+                .title(track.name)
+                .byline("${track.artistName} - ${track.albumName}")
                 .imageUri(uri)
                 .viewIntent(Intent("android.intent.action.MUSIC_PLAYER"))
                 .build())
 
         val editor = sharedPreferences.edit()
-        editor.putString("lastTrackName", trackName)
-        editor.putString("lastArtistName", artistName)
-        editor.putString("lastAlbumName", albumName)
+        editor.putString("lastTrackName", track.name)
+        editor.putString("lastArtistName", track.artistName)
+        editor.putString("lastAlbumName", track.albumName)
         editor.putString("lastUri", uri.toString())
         editor.apply()
     }
@@ -62,12 +60,10 @@ class MusicExtensionSource : RemoteMuzeiArtSource("MusicExtensionSource") {
     override fun onTryUpdate(reason: Int) {
         if (reason == MuzeiArtSource.UPDATE_REASON_INITIAL) {
             val prefs = sharedPreferences
-            val trackName = prefs.getString("lastTrackName", null)
-            val artistName = prefs.getString("lastArtistName", null)
-            val albumName = prefs.getString("lastAlbumName", null)
+            val track = Track.build(prefs.getString("lastTrackName", null), prefs.getString("lastUri", null), prefs.getString("lastArtistName", null))
             val uri = prefs.getString("lastUri", null)
-            if (artistName != null && albumName != null && trackName != null && uri != null) {
-                publishArtwork(artistName, albumName, trackName, Uri.parse(uri))
+            if (track != null && uri != null) {
+                publishArtwork(track, Uri.parse(uri))
             }
         }
     }
@@ -76,26 +72,43 @@ class MusicExtensionSource : RemoteMuzeiArtSource("MusicExtensionSource") {
         super.onHandleIntent(intent)
 
         if (intent != null && intent.action != null) {
+
+            Log.i(TAG, "Intent received..")
+
             if (intent.action == Constants.EXTENSION_UPDATE_INTENT) {
+
+                Log.i(TAG, "Updating")
+
                 val extras = intent.extras
                 if (extras != null) {
-                    val artistName = extras.getString(Constants.KEY_ARTIST)
-                    val albumName = extras.getString(Constants.KEY_ALBUM)
-                    val trackName = extras.getString(Constants.KEY_TRACK)
-                    if (artistName != null && albumName != null && trackName != null) {
-                        artworkProvider.getArtwork(this, artistName, albumName, { uri ->
-                            publishArtwork(artistName, albumName, trackName, uri)
+
+                    Log.i(TAG, "Extras non null")
+
+                    val track = Track.build(extras.getString(Constants.KEY_TRACK), extras.getString(Constants.KEY_ARTIST), extras.getString(Constants.KEY_ALBUM))
+                    if (track != null) {
+
+                        Log.i(TAG, "Getting artwork.. $track")
+
+                        artworkProvider.getArtwork(this, track, { uri ->
+                            Log.i(TAG, "Publishing artwork. Track: $track, Uri: $uri")
+                            publishArtwork(track, uri)
                         })
                     }
-
                 }
             } else if (intent.action == Constants.EXTENSION_CLEAR_INTENT) {
                 val prefs = PreferenceManager.getDefaultSharedPreferences(this)
                 if (prefs.getBoolean(SettingsActivity.KEY_PREF_USE_DEFAULT_ARTWORK, false)) {
                     val file = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "default_wallpaper.jpg")
-                    publishArtwork(Artwork.Builder()
-                            .imageUri(if (file.exists()) Uri.fromFile(file) else null)
-                            .build())
+
+                    var uri: Uri? = null
+                    if (file.exists()) {
+                        uri = StreamProvider.getUriForFile(applicationContext.packageName + ".streamprovider", file)
+                    }
+
+                    val artwork = Artwork.Builder()
+                            .imageUri(uri)
+                            .build()
+                    publishArtwork(artwork)
                 }
             }
         }

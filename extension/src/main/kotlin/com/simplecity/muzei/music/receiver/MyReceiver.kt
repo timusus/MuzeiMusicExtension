@@ -9,9 +9,7 @@ import com.simplecity.muzei.music.service.MusicExtensionSource
 class MyReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-
-        val extras = intent.extras
-        if (extras != null) {
+        intent.extras?.let { extras ->
             val artistName = extras.getString(Constants.KEY_ARTIST)
             val albumName = extras.getString(Constants.KEY_ALBUM)
             val trackName = extras.getString(Constants.KEY_TRACK)
@@ -28,17 +26,12 @@ class MyReceiver : BroadcastReceiver() {
             if (extras.containsKey("playing")) {
                 if (!extras.getBoolean("playing", true)) {
 
-                    //The song has been paused. Set the Muzei artwork to something else.
+                    // The song has been paused. Set the Muzei artwork to something else.
                     val clearIntent = Intent(context, MusicExtensionSource::class.java)
                     clearIntent.action = Constants.EXTENSION_CLEAR_INTENT
                     context.startService(clearIntent)
                 }
             }
         }
-    }
-
-    companion object {
-
-        private val TAG = "MyReceiver"
     }
 }

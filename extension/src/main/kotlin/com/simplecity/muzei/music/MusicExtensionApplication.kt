@@ -9,6 +9,8 @@ class MusicExtensionApplication : Application() {
 
     private lateinit var appComponent: AppComponent
 
+    var notificationsEnabled = false
+
     override fun onCreate() {
         super.onCreate()
 
@@ -21,7 +23,7 @@ class MusicExtensionApplication : Application() {
         return appComponent
     }
 
-    fun enableStrictMode() {
+    private fun enableStrictMode() {
         if (BuildConfig.DEBUG) {
             StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder()
                     .detectAll()

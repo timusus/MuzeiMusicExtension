@@ -28,13 +28,15 @@ static def getProperty(@Nullable Properties properties, String name) {
     return properties.getProperty(name) ?: "$name missing"
 }
 
+def supportLibVersion = '25.4.0'
+
 dependencies {
 
     // Muzei API
     implementation 'com.google.android.apps.muzei:muzei-api:2.0'
 
     // Support libs
-    implementation "com.android.support:appcompat-v7:25.4.0"
+    implementation "com.android.support:appcompat-v7:$supportLibVersion"
 
     // Stream provider
     implementation 'com.commonsware.cwac:provider:0.5.2'
@@ -53,6 +55,9 @@ dependencies {
     // Dagger
     implementation 'com.google.dagger:dagger:2.11'
     kapt 'com.google.dagger:dagger-compiler:2.11'
+
+    // Material Intro Screen
+    implementation project(':material-intro-screen')
 }
 
 android {
@@ -60,10 +65,10 @@ android {
     buildToolsVersion '25.0.3'
 
     defaultConfig {
-        minSdkVersion 17
+        minSdkVersion 21
         targetSdkVersion 25
 
-        versionName '2.0'
+        versionName '2.0-beta1'
         versionCode gitCommitCount()
 
         buildConfigField "String", "PROXY_IP", "\"\""
@@ -94,6 +99,19 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        eachDependency { details ->
+            // Force all of the primary support libraries to use the same version.
+            if (details.requested.group == 'com.android.support'
+                    && details.requested.name != 'multidex'
+                    && details.requested.name != 'multidex-instrumentation') {
+                details.useVersion supportLibVersion
+            }
+        }
     }
 }
 

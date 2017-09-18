@@ -1,1 +1,3 @@
-include ':extension'
+include ':extension', 'material-intro-screen'
+
+project(':material-intro-screen').projectDir = file('external/material-intro-screen')

@@ -1,36 +1,41 @@
 <resources>
     <string name="app_name">Muzei Music Extension</string>
+
     <string name="source_name">Music</string>
+
     <string name="source_description">Album artwork from your music library</string>
+
     <string name="title_settings">Settings</string>
+
     <string name="title_setup">Setup</string>
 
-    <string name="pref_string_title_download_wifi_only">Download via Wi-Fi only</string>
-    <string name="pref_string_summary_download_wifi_only">Artwork will only be downloaded if a Wi-Fi connection is available</string>
-    <string name="pref_string_title_artwork_resolution">Artwork resolution</string>
-    <string name="pref_string_summary_artwork_resolution">Choose the resolution of the artwork downloaded from Last.fm</string>
+    <string name="pref_string_title_download_wifi_only">Download via WiFi only</string>
+
+    <string name="pref_string_summary_download_wifi_only">Artwork will only be downloaded if a WiFi connection is available.</string>
+
     <string name="pref_string_title_notifications">Notification Access</string>
-    <string name="pref_string_summary_notifications">Muzei Music Extension needs permission to access your notifications for Spotify support (Android 4.3+).
-    \n\nThe extension needs the same permission for access to the lockscreen controls for Pandora support and any other music player which doesn\'t work otherwise. (Android 4.4+)</string>
+
+    <string name="pref_string_summary_notifications">Muzei Music Extension needs permission to access your notifications, in order to see which song is currently playing.</string>
+
     <string name="pref_string_title_default_artwork">Default artwork</string>
-    <string name="pref_string_summary_default_artwork">Choose an image from your device, which will display when no music is playing.
-    \n\nYou may need to change tracks a few times for this to update</string>
+
+    <string name="pref_string_summary_default_artwork">Choose an image from your device, which will display when no music is playing.</string>
+
     <string name="pref_string_title_use_default_artwork">Use default artwork</string>
-    <string name="pref_string_summary_use_default_artwork">If unchecked, the extension will always display the last album art, even if no music is playing</string>
-    <string name="pref_size_mega">Large (500px +)</string>
-    <string name="pref_size_extra_large">Medium (300px)</string>
-    <string name="pref_size_large">Small (175px)</string>
 
-    <string-array name="pref_size_options_array">
-        <item>@string/pref_size_mega</item>
-        <item>@string/pref_size_extra_large</item>
-        <item>@string/pref_size_large</item>
-    </string-array>
+    <string name="pref_string_summary_use_default_artwork">If unchecked, the extension will always display the last album art, even if no music is playing.</string>
 
-    <string-array name="pref_size_values_array">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-    </string-array>
+    <string name="slideOneTitle">Storage permissions</string>
+    <string name="slideOneDescription">Muzei Music Extension requires read &amp; write access to external storage, in order to retrieve and save artwork images.</string>
+
+    <string name="slideTwoTitle">Notification settings</string>
+    <string name="slideTwoDescription">Muzei Music Extension works much better if it can listen for song changes. To do this, it needs to register as a notification listener. \n\nThis is required for many popular apps, including Spotify and Pandora.</string>
+
+    <string name="settingsButton">Settings</string>
+
+    <string name="closeButton">Close</string>
+
+    <string name="notificationSettingsDialogTitle">Notification Settings</string>
+    <string name="notificationSettingsDialogMessage">Muzei Music Extension is not enabled as a Notification Listener. This is required for listening to track changes for many popular apps, including Spotify and Pandora.</string>
 
 </resources>

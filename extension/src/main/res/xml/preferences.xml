@@ -1,22 +1,22 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <CheckBoxPreference
+    <SwitchPreference
         android:defaultValue="false"
         android:key="pref_key_wifi_only"
         android:summary="@string/pref_string_summary_download_wifi_only"
-        android:title="@string/pref_string_title_download_wifi_only" />
-    <PreferenceScreen
+        android:title="@string/pref_string_title_download_wifi_only"/>
+    <Preference
         android:key="pref_key_notifications"
         android:summary="@string/pref_string_summary_notifications"
         android:title="@string/pref_string_title_notifications">
-        <intent android:action="android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS" />
-    </PreferenceScreen>
-    <PreferenceScreen
+        <intent android:action="android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"/>
+    </Preference>
+    <Preference
         android:key="pref_key_default_artwork"
         android:summary="@string/pref_string_summary_default_artwork"
-        android:title="@string/pref_string_title_default_artwork" />
-    <CheckBoxPreference
+        android:title="@string/pref_string_title_default_artwork"/>
+    <SwitchPreference
         android:defaultValue="true"
         android:key="pref_key_use_default_artwork"
         android:summary="@string/pref_string_summary_use_default_artwork"
-        android:title="@string/pref_string_title_use_default_artwork" />
+        android:title="@string/pref_string_title_use_default_artwork"/>
 </PreferenceScreen>
