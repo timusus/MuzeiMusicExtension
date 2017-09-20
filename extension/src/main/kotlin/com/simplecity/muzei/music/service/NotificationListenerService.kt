@@ -53,15 +53,17 @@ class NotificationListenerService : android.service.notification.NotificationLis
                 }
             }
 
-            override fun onMetadataChanged(metadata: MediaMetadata) {
-                val intent = Intent(this@NotificationListenerService, MusicExtensionSource::class.java)
-                intent.action = Constants.EXTENSION_UPDATE_INTENT
-                val bundle = Bundle()
-                bundle.putString(Constants.KEY_TRACK, metadata.getString(MediaMetadata.METADATA_KEY_TITLE))
-                bundle.putString(Constants.KEY_ALBUM, metadata.getString(MediaMetadata.METADATA_KEY_ALBUM))
-                bundle.putString(Constants.KEY_ARTIST, metadata.getString(MediaMetadata.METADATA_KEY_ARTIST))
-                intent.putExtras(bundle)
-                startService(intent)
+            override fun onMetadataChanged(metadata: MediaMetadata?) {
+                metadata?.let { metadata ->
+                    val intent = Intent(this@NotificationListenerService, MusicExtensionSource::class.java)
+                    intent.action = Constants.EXTENSION_UPDATE_INTENT
+                    val bundle = Bundle()
+                    bundle.putString(Constants.KEY_TRACK, metadata.getString(MediaMetadata.METADATA_KEY_TITLE))
+                    bundle.putString(Constants.KEY_ALBUM, metadata.getString(MediaMetadata.METADATA_KEY_ALBUM))
+                    bundle.putString(Constants.KEY_ARTIST, metadata.getString(MediaMetadata.METADATA_KEY_ARTIST))
+                    intent.putExtras(bundle)
+                    startService(intent)
+                }
             }
         }
 
