@@ -6,9 +6,11 @@ import agency.tango.materialintroscreen.SlideFragmentBuilder
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.support.v4.app.NotificationManagerCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
-import com.simplecity.muzei.music.MusicExtensionApplication
 import com.simplecity.muzei.music.R
 
 class SetupActivity : MaterialIntroActivity() {
@@ -20,33 +22,51 @@ class SetupActivity : MaterialIntroActivity() {
 
         hideBackButton()
 
-        addSlide(SlideFragmentBuilder()
-                .title(getString(R.string.slideOneTitle))
-                .description(getString(R.string.slideOneDescription))
-                .backgroundColor(R.color.slide_one)
-                .buttonsColor(R.color.button_one)
-                .neededPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE))
-                .build())
+        val permissionsGranted = permissionsGranted()
+        val notificationListenerEnabled = notificationListenerEnabled()
 
-        addSlide(SlideFragmentBuilder()
-                .title(getString(R.string.slideTwoTitle))
-                .description(getString(R.string.slideTwoDescription))
-                .backgroundColor(R.color.slide_two)
-                .buttonsColor(R.color.button_two)
-                .build(), MessageButtonBehaviour({
-            openNotificationListenerSettings()
-        }, getString(R.string.settingsButton)))
+        if (permissionsGranted && notificationListenerEnabled) {
+            setResultAndFinish()
+            return
+        }
+
+        if (!permissionsGranted) {
+            addSlide(SlideFragmentBuilder()
+                    .title(getString(R.string.slideOneTitle))
+                    .description(getString(R.string.slideOneDescription))
+                    .backgroundColor(R.color.slide_one)
+                    .buttonsColor(R.color.button_one)
+                    .neededPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE))
+                    .build())
+        }
+
+        if (!notificationListenerEnabled) {
+            addSlide(SlideFragmentBuilder()
+                    .title(getString(R.string.slideTwoTitle))
+                    .description(getString(R.string.slideTwoDescription))
+                    .backgroundColor(R.color.slide_two)
+                    .buttonsColor(R.color.button_two)
+                    .build(), MessageButtonBehaviour({
+                openNotificationListenerSettings()
+            }, getString(R.string.settingsButton)))
+        }
     }
 
     override fun onResume() {
         super.onResume()
 
-        if (notificationListenerEnabled()) {
+        if (permissionsGranted() && notificationListenerEnabled()) {
             setResultAndFinish()
         }
     }
 
-    private fun notificationListenerEnabled() = (applicationContext as MusicExtensionApplication).notificationsEnabled
+    private fun permissionsGranted(): Boolean {
+        return ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun notificationListenerEnabled(): Boolean {
+        return NotificationManagerCompat.getEnabledListenerPackages(applicationContext).contains(applicationContext.packageName)
+    }
 
     private fun openNotificationListenerSettings() {
         startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"))

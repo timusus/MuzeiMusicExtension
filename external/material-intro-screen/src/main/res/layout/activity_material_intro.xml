@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    android:background="@android:color/transparent"
+    android:background="#7F000000"
     android:orientation="vertical">
 
     <agency.tango.materialintroscreen.widgets.OverScrollViewPager
