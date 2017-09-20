@@ -28,9 +28,9 @@ class NotificationListenerService : android.service.notification.NotificationLis
         super.onCreate()
 
         mediaControllerCallback = object : MediaController.Callback() {
-            override fun onPlaybackStateChanged(playbackState: PlaybackState) {
+            override fun onPlaybackStateChanged(playbackState: PlaybackState?) {
 
-                when (playbackState.state) {
+                when (playbackState?.state) {
                     PlaybackState.STATE_PLAYING -> {
                         mediaController?.metadata?.let { metadata ->
                             val intent = Intent(this@NotificationListenerService, MusicExtensionSource::class.java)
