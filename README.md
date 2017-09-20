@@ -21,6 +21,13 @@ Current Version: 2.0
 - Use regex when performing folder search, covers more artwork naming possibilities
 - Fixed an issue where Muzei didn't have permission to access artwork Uris (using StreamProvider)
 - Added SetupActivity, which requests for necessary permissions (write external storage)
+- Bump minSDK to 21 (Lollipop)
+- Added onboarding screen for requesting permissions
+- Added a ‘Track’ model to encapsulate track data
+- Don’t attempt to store non-local artwork on disk or in the MediaStore. Just pass the url to Muzei and let it do its own caching.
+- Update to AppCompat & use SwitchPreference in Settings screen
+- Disable custom BroadcastReceiver if NotificationListener is running - no need for both, and NotificationListener is going to be much more reliable.
+- Remove any sort of gleaning of track information from the notification in the NotificationListenerService, and instead just look at the MediaController Metadata
 
 1.0.6
 - Fixed a crash occurring when toggling notification settings
