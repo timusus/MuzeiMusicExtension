@@ -11,7 +11,10 @@ Muzei Music Extension is on the [Play Store](https://play.google.com/store/apps/
 
 ### Changelog:
 
-Current Version: 2.0
+Current Version: 2.0.1
+
+#### 2.0.1
+- Crash fixes
 
 #### 2.0
 - Migrated to `Kotlin`

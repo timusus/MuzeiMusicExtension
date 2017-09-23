@@ -68,7 +68,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 25
 
-        versionName '2.0'
+        versionName '2.0.1'
         versionCode gitCommitCount()
 
         buildConfigField "String", "PROXY_IP", "\"\""
