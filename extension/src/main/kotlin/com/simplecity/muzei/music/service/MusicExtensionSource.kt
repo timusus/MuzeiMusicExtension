@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import android.preference.PreferenceManager
-import android.util.Log
 import com.commonsware.cwac.provider.StreamProvider
 import com.google.android.apps.muzei.api.Artwork
 import com.google.android.apps.muzei.api.MuzeiArtSource
@@ -40,7 +39,7 @@ class MusicExtensionSource : RemoteMuzeiArtSource("MusicExtensionSource") {
     /**
      * Publishes the [com.google.android.apps.muzei.api.Artwork] to Muzei
      */
-    fun publishArtwork(track: Track, uri: Uri?) {
+    private fun publishArtwork(track: Track, uri: Uri?) {
         publishArtwork(Artwork.Builder()
                 .title(track.name)
                 .byline("${track.artistName} - ${track.albumName}")
@@ -73,24 +72,13 @@ class MusicExtensionSource : RemoteMuzeiArtSource("MusicExtensionSource") {
 
         if (intent != null && intent.action != null) {
 
-            Log.i(TAG, "Intent received..")
-
             if (intent.action == Constants.EXTENSION_UPDATE_INTENT) {
-
-                Log.i(TAG, "Updating")
 
                 val extras = intent.extras
                 if (extras != null) {
-
-                    Log.i(TAG, "Extras non null")
-
                     val track = Track.build(extras.getString(Constants.KEY_TRACK), extras.getString(Constants.KEY_ARTIST), extras.getString(Constants.KEY_ALBUM))
                     if (track != null) {
-
-                        Log.i(TAG, "Getting artwork.. $track")
-
                         artworkProvider.getArtwork(this, track, { uri ->
-                            Log.i(TAG, "Publishing artwork. Track: $track, Uri: $uri")
                             publishArtwork(track, uri)
                         })
                     }
