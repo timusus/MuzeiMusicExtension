@@ -29,18 +29,21 @@ class NotificationListenerService : android.service.notification.NotificationLis
 
         mediaControllerCallback = object : MediaController.Callback() {
             override fun onPlaybackStateChanged(playbackState: PlaybackState?) {
-
                 when (playbackState?.state) {
                     PlaybackState.STATE_PLAYING -> {
                         mediaController?.metadata?.let { metadata ->
-                            val intent = Intent(this@NotificationListenerService, MusicExtensionSource::class.java)
-                            val bundle = Bundle()
-                            bundle.putString(Constants.KEY_TRACK, metadata.getString(MediaMetadata.METADATA_KEY_TITLE))
-                            bundle.putString(Constants.KEY_ALBUM, metadata.getString(MediaMetadata.METADATA_KEY_ALBUM))
-                            bundle.putString(Constants.KEY_ARTIST, metadata.getString(MediaMetadata.METADATA_KEY_ARTIST))
-                            intent.putExtras(bundle)
-                            intent.action = Constants.EXTENSION_UPDATE_INTENT
-                            startService(intent)
+                            try {
+                                val intent = Intent(this@NotificationListenerService, MusicExtensionSource::class.java)
+                                val bundle = Bundle()
+                                bundle.putString(Constants.KEY_TRACK, metadata.getString(MediaMetadata.METADATA_KEY_TITLE))
+                                bundle.putString(Constants.KEY_ALBUM, metadata.getString(MediaMetadata.METADATA_KEY_ALBUM))
+                                bundle.putString(Constants.KEY_ARTIST, metadata.getString(MediaMetadata.METADATA_KEY_ARTIST))
+                                intent.putExtras(bundle)
+                                intent.action = Constants.EXTENSION_UPDATE_INTENT
+                                startService(intent)
+                            } catch (e: RuntimeException) {
+                                Log.e(TAG, "An error occurred reading the media metadata: $e")
+                            }
                         }
                     }
                     PlaybackState.STATE_STOPPED,
@@ -55,14 +58,18 @@ class NotificationListenerService : android.service.notification.NotificationLis
 
             override fun onMetadataChanged(metadata: MediaMetadata?) {
                 metadata?.let { metadata ->
-                    val intent = Intent(this@NotificationListenerService, MusicExtensionSource::class.java)
-                    intent.action = Constants.EXTENSION_UPDATE_INTENT
-                    val bundle = Bundle()
-                    bundle.putString(Constants.KEY_TRACK, metadata.getString(MediaMetadata.METADATA_KEY_TITLE))
-                    bundle.putString(Constants.KEY_ALBUM, metadata.getString(MediaMetadata.METADATA_KEY_ALBUM))
-                    bundle.putString(Constants.KEY_ARTIST, metadata.getString(MediaMetadata.METADATA_KEY_ARTIST))
-                    intent.putExtras(bundle)
-                    startService(intent)
+                    try {
+                        val intent = Intent(this@NotificationListenerService, MusicExtensionSource::class.java)
+                        intent.action = Constants.EXTENSION_UPDATE_INTENT
+                        val bundle = Bundle()
+                        bundle.putString(Constants.KEY_TRACK, metadata.getString(MediaMetadata.METADATA_KEY_TITLE))
+                        bundle.putString(Constants.KEY_ALBUM, metadata.getString(MediaMetadata.METADATA_KEY_ALBUM))
+                        bundle.putString(Constants.KEY_ARTIST, metadata.getString(MediaMetadata.METADATA_KEY_ARTIST))
+                        intent.putExtras(bundle)
+                        startService(intent)
+                    } catch (e: RuntimeException) {
+                        Log.e(TAG, "An error occurred reading the media metadata: $e")
+                    }
                 }
             }
         }
