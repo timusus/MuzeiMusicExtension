@@ -1,10 +1,13 @@
 package com.simplecity.muzei.music.artwork
 
+import android.Manifest
 import android.content.ContentUris
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.preference.PreferenceManager
 import android.provider.MediaStore
+import android.support.v4.content.ContextCompat
 import android.util.Log
 import com.commonsware.cwac.provider.StreamProvider
 import com.simplecity.muzei.music.activity.SettingsActivity
@@ -101,6 +104,9 @@ class ArtworkProvider @Inject constructor(private val lastFmApi: LastFmApi) {
     }
 
     private fun getTrackFromMediaStore(context: Context, track: Track): MediaStoreTrack? {
+
+        if (!permissionsGranted(context)) return null
+
         val projection = arrayOf(
                 MediaStore.Audio.Media._ID,
                 MediaStore.Audio.Media.DATA,
@@ -182,5 +188,9 @@ class ArtworkProvider @Inject constructor(private val lastFmApi: LastFmApi) {
             }
         }
         return null
+    }
+
+    private fun permissionsGranted(context: Context): Boolean {
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
     }
 }

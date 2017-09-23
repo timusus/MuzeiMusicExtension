@@ -36,7 +36,7 @@ class SetupActivity : MaterialIntroActivity() {
                     .description(getString(R.string.slideOneDescription))
                     .backgroundColor(R.color.slide_one)
                     .buttonsColor(R.color.button_one)
-                    .neededPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE))
+                    .neededPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE))
                     .build())
         }
 
@@ -61,7 +61,7 @@ class SetupActivity : MaterialIntroActivity() {
     }
 
     private fun permissionsGranted(): Boolean {
-        return ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        return ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun notificationListenerEnabled(): Boolean {
