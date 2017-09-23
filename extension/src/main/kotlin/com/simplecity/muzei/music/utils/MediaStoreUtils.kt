@@ -3,6 +3,7 @@ package com.simplecity.muzei.music.utils
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
+import android.database.sqlite.SQLiteException
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Environment
@@ -39,9 +40,13 @@ object MediaStoreUtils {
                     success = false
                     // Failed to insert into the database. Attempt to update existing entry (if there is one)
                     newUri = ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), track.albumId)
-                    if (context.applicationContext.contentResolver.update(newUri, values, null, null) > 0) {
-                        // Failed to insert into the database
-                        success = true
+                    try {
+                        if (context.applicationContext.contentResolver.update(newUri, values, null, null) > 0) {
+                            // Failed to insert into the database
+                            success = true
+                        }
+                    } catch (e: SQLiteException) {
+                        Log.e(TAG, "Failed to update MediaStore row. Uri; $newUri")
                     }
                 }
 
