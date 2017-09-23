@@ -126,11 +126,11 @@ class ArtworkProvider @Inject constructor(private val lastFmApi: LastFmApi) {
         )?.use { cursor ->
             if (cursor.moveToFirst()) {
                 val mediaStoreTrack = MediaStoreTrack(
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TRACK)),
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)),
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)),
-                        cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)),
-                        cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)),
+                        cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)),
                         null
                 )
                 mediaStoreTrack.artworkPath = getArtworkPath(context, mediaStoreTrack)
