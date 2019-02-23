@@ -149,8 +149,7 @@ class ArtworkProvider @Inject constructor(private val lastFmApi: LastFmApi) {
                 null
         )?.use { cursor ->
             if (cursor.moveToFirst()) {
-                val path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART))
-                return path
+                return cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART))
             }
         }
 

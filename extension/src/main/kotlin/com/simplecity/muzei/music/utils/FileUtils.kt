@@ -6,7 +6,7 @@ import java.io.IOException
 
 object FileUtils {
 
-    const val TAG = "FileUtils"
+    private const val TAG = "FileUtils"
 
     /**
      * Checks to see whether the path exists, or creates it if not

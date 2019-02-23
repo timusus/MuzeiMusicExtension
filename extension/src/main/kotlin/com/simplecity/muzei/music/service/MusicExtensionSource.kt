@@ -78,9 +78,9 @@ class MusicExtensionSource : RemoteMuzeiArtSource("MusicExtensionSource") {
                 if (extras != null) {
                     val track = Track.build(extras.getString(Constants.KEY_TRACK), extras.getString(Constants.KEY_ARTIST), extras.getString(Constants.KEY_ALBUM))
                     if (track != null) {
-                        artworkProvider.getArtwork(this, track, { uri ->
+                        artworkProvider.getArtwork(this, track) { uri ->
                             publishArtwork(track, uri)
-                        })
+                        }
                     }
                 }
             } else if (intent.action == Constants.EXTENSION_CLEAR_INTENT) {

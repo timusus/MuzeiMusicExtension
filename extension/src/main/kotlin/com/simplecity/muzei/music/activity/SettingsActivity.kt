@@ -20,7 +20,7 @@ class SettingsActivity : PreferenceActivity() {
 
     companion object {
 
-        private val PICK_IMAGE = 100
+        private const val PICK_IMAGE = 100
 
         const val KEY_PREF_WIFI_ONLY = "pref_key_wifi_only"
         const val KEY_PREF_DEFAULT_ARTWORK = "pref_key_default_artwork"

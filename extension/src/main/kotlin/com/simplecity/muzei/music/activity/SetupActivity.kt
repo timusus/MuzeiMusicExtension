@@ -79,7 +79,7 @@ class SetupActivity : MaterialIntroActivity() {
                 .setPositiveButton(R.string.settingsButton) { _, _ ->
                     openNotificationListenerSettings()
                 }
-                .setNegativeButton(getString(R.string.closeButton), { _, _ -> setResultAndFinish() })
+                .setNegativeButton(getString(R.string.closeButton)) { _, _ -> setResultAndFinish() }
                 .show()
     }
 

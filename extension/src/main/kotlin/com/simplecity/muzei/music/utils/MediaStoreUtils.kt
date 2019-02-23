@@ -15,7 +15,7 @@ import java.io.FileOutputStream
 
 object MediaStoreUtils {
 
-    private val TAG = "MediaStoreUtils"
+    private const val TAG = "MediaStoreUtils"
 
     fun addArtworkToMediaStore(context: Context, bitmap: Bitmap?, track: MediaStoreTrack): Uri? {
 
