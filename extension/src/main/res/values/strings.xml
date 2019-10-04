@@ -17,25 +17,14 @@
 
     <string name="pref_string_summary_notifications">Muzei Music Extension needs permission to access your notifications, in order to see which song is currently playing.</string>
 
-    <string name="pref_string_title_default_artwork">Default artwork</string>
-
-    <string name="pref_string_summary_default_artwork">Choose an image from your device, which will display when no music is playing.</string>
-
-    <string name="pref_string_title_use_default_artwork">Use default artwork</string>
-
-    <string name="pref_string_summary_use_default_artwork">If unchecked, the extension will always display the last album art, even if no music is playing.</string>
-
-    <string name="slideOneTitle">Storage permissions</string>
-    <string name="slideOneDescription">Muzei Music Extension requires read &amp; write access to external storage, in order to retrieve and save artwork images.</string>
-
-    <string name="slideTwoTitle">Notification settings</string>
-    <string name="slideTwoDescription">Muzei Music Extension works much better if it can listen for song changes. To do this, it needs to register as a notification listener. \n\nThis is required for many popular apps, including Spotify and Pandora.</string>
+    <string name="notificationSettingsTitle">Notification settings</string>
+    <string name="notificationSettingsDescription">In order to listen for song changes, Muzei Music Extension needs to register as a notification listener. This is required due to changes in Android 8.0.</string>
 
     <string name="settingsButton">Settings</string>
 
     <string name="closeButton">Close</string>
 
     <string name="notificationSettingsDialogTitle">Notification Settings</string>
-    <string name="notificationSettingsDialogMessage">Muzei Music Extension is not enabled as a Notification Listener. This is required for listening to track changes for many popular apps, including Spotify and Pandora.</string>
+    <string name="notificationSettingsDialogMessage">Muzei Music Extension is not enabled as a Notification Listener. The app will not function correctly otherwise.</string>
 
 </resources>

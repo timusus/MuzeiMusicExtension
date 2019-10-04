@@ -10,13 +10,4 @@
         android:title="@string/pref_string_title_notifications">
         <intent android:action="android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"/>
     </Preference>
-    <Preference
-        android:key="pref_key_default_artwork"
-        android:summary="@string/pref_string_summary_default_artwork"
-        android:title="@string/pref_string_title_default_artwork"/>
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="pref_key_use_default_artwork"
-        android:summary="@string/pref_string_summary_use_default_artwork"
-        android:title="@string/pref_string_title_use_default_artwork"/>
 </PreferenceScreen>
