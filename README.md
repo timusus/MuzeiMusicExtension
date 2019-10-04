@@ -2,16 +2,21 @@
 
 A simple music extension for [Muzei](http://muzei.co/), which displays the artwork of the currently playing song in Muzei.
 
-1. The music extension receives `MediaController Metadata` changes (via the `NotificationListenerService`)
+1. The music extension receives `MediaController Metadata/Playstate` changes (via the `NotificationListenerService`)
 2. The artist name, album name and track name are retrieved from the `Metadata`
-3. The extension searches for the artwork on the device (in the `MediaStore` and in the folder of the file itself)
-4. If no artwork is found on the device, the artwork `Uri` is retrieved from Last.fm and passed to Muzei
+3. The extension retrieves artwork from the internet and passes it to Muzei.
 
 Muzei Music Extension is on the [Play Store](https://play.google.com/store/apps/details?id=com.simplecity.muzei.music)
 
 ### Changelog:
 
-Current Version: 2.0.1
+Current Version: 2.1.0
+
+#### 2.1.0
+- Google have nerfed manifest declared broadcast receivers, which means we can no longer listen to `metachanged` events from various apps, since they're not targeted directly at Muzei. So, we now rely exclusively on the NotificationListenerService for metadata & playstate changes.
+- Use Shuttle's artwork API, since Last.FM is unreliable. Since the API redirects to the url of the actual image, we no longer need to parse any JSON, so Retrofit/OkHttp are no longer required.
+- Since Muzei performs its own caching, and Google prevent us from discovering artwork on disk, we now just fetch artwork exclusively from online sources. We no longer need access to the MediaStore.
+- The option to revert to default artwork when music isn't playing has been removed. Since artwork providers could be local or remote, and it's difficult to determine the actual play state, we now just display the most recent artwork.
 
 #### 2.0.1
 - Crash fixes
@@ -94,7 +99,7 @@ Current Version: 2.0.1
 
 #### License
 
-    Copyright 2013 Tim Malseed
+    Copyright 2019 Tim Malseed
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
