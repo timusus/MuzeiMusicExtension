@@ -43,7 +43,7 @@ android {
         targetSdkVersion 29
 
         versionName '2.1.0'
-        versionCode gitCommitCount()
+        versionCode 81
     }
 
     signingConfigs {
@@ -76,20 +76,4 @@ android {
             sourceCompatibility = "8"
         }
     }
-}
-
-def gitCommitCount() {
-    def commitCount = 0
-    try {
-        def stdout = new ByteArrayOutputStream()
-        exec {
-            commandLine 'git', 'rev-list', '--all', '--count'
-            standardOutput stdout
-        }
-        commitCount = stdout.toString().trim().toInteger()
-    }
-    catch (error) {
-        println "Error: ${error}"
-    }
-    return commitCount
 }
