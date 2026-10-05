@@ -1,8 +1,11 @@
 package com.simplecity.muzei.music.activity
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
@@ -69,11 +72,21 @@ class SetupActivity : AppCompatActivity() {
         return NotificationManagerCompat.getEnabledListenerPackages(applicationContext).contains(applicationContext.packageName)
     }
 
+    companion object {
+        private const val TAG = "SetupActivity"
+    }
+
     private fun openNotificationListenerSettings() {
-        startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"))
+        try {
+            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+        } catch (e: ActivityNotFoundException) {
+            Log.e(TAG, "Notification listener settings not available")
+        }
     }
 
     private fun showDialog() {
+        hasSeenDialog = true
+
         AlertDialog.Builder(this)
                 .setTitle(getString(R.string.notificationSettingsDialogTitle))
                 .setMessage(getString(R.string.notificationSettingsDialogMessage))
