@@ -26,6 +26,11 @@ class SetupActivity : AppCompatActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
+        if (savedInstanceState != null) {
+            hasSeenDialog = savedInstanceState.getBoolean(STATE_HAS_SEEN_DIALOG, false)
+            isFirstPresentation = savedInstanceState.getBoolean(STATE_IS_FIRST_PRESENTATION, true)
+        }
+
         val notificationListenerEnabled = notificationListenerEnabled()
 
         if (notificationListenerEnabled) {
@@ -68,12 +73,21 @@ class SetupActivity : AppCompatActivity() {
         isFirstPresentation = false
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putBoolean(STATE_HAS_SEEN_DIALOG, hasSeenDialog)
+        outState.putBoolean(STATE_IS_FIRST_PRESENTATION, isFirstPresentation)
+    }
+
     private fun notificationListenerEnabled(): Boolean {
         return NotificationManagerCompat.getEnabledListenerPackages(applicationContext).contains(applicationContext.packageName)
     }
 
     companion object {
         private const val TAG = "SetupActivity"
+        private const val STATE_HAS_SEEN_DIALOG = "hasSeenDialog"
+        private const val STATE_IS_FIRST_PRESENTATION = "isFirstPresentation"
     }
 
     private fun openNotificationListenerSettings() {
