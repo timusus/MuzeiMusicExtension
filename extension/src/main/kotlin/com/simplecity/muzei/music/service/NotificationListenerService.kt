@@ -2,6 +2,7 @@ package com.simplecity.muzei.music.service
 
 import android.content.ComponentName
 import android.content.Context
+import android.content.SharedPreferences
 import android.media.MediaMetadata
 import android.media.session.MediaController
 import android.media.session.MediaSession
@@ -15,6 +16,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import com.simplecity.muzei.music.MusicExtensionApplication
+import com.simplecity.muzei.music.activity.SettingsActivity
 import com.simplecity.muzei.music.model.Track
 import com.simplecity.muzei.music.utils.NetworkUtils
 
@@ -56,6 +58,15 @@ class NotificationListenerService : android.service.notification.NotificationLis
         }
     }
 
+    // Held strongly: SharedPreferences only keeps a weak reference to its listeners
+    private val preferenceListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
+        if (key == SettingsActivity.KEY_PREF_WIFI_ONLY && !prefs.getBoolean(key, false)) {
+            mainHandler.post { publishSkippedTrack() }
+        }
+    }
+
+    private var preferenceListenerRegistered = false
+
     private fun createCallback(controller: MediaController) = object : MediaController.Callback() {
         override fun onPlaybackStateChanged(state: PlaybackState?) {
             publishPlayingTrack(controller)
@@ -86,9 +97,11 @@ class NotificationListenerService : android.service.notification.NotificationLis
         addSessionStateChangeListener()
 
         registerNetworkCallback()
+        registerPreferenceListener()
     }
 
     override fun onListenerDisconnected() {
+        unregisterPreferenceListener()
         unregisterNetworkCallback()
         removeSessionStateChangeListener()
         clearMediaControllers()
@@ -97,6 +110,7 @@ class NotificationListenerService : android.service.notification.NotificationLis
     }
 
     override fun onDestroy() {
+        unregisterPreferenceListener()
         unregisterNetworkCallback()
         removeSessionStateChangeListener()
         clearMediaControllers()
@@ -202,10 +216,28 @@ class NotificationListenerService : android.service.notification.NotificationLis
     }
 
     private fun publishSkippedTrack() {
-        if (!networkCallbackRegistered) {
+        if (!networkCallbackRegistered && !preferenceListenerRegistered) {
             return
         }
         skippedTrack?.let { publishTrack(it) }
+    }
+
+    private fun registerPreferenceListener() {
+        if (preferenceListenerRegistered) {
+            return
+        }
+        (applicationContext as MusicExtensionApplication).sharedPreferences
+                .registerOnSharedPreferenceChangeListener(preferenceListener)
+        preferenceListenerRegistered = true
+    }
+
+    private fun unregisterPreferenceListener() {
+        if (!preferenceListenerRegistered) {
+            return
+        }
+        (applicationContext as MusicExtensionApplication).sharedPreferences
+                .unregisterOnSharedPreferenceChangeListener(preferenceListener)
+        preferenceListenerRegistered = false
     }
 
     private fun registerNetworkCallback() {
