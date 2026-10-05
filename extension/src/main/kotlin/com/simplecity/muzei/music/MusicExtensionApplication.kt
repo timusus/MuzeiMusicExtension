@@ -36,14 +36,17 @@ class MusicExtensionApplication : Application() {
         }
     }
 
-    fun publishArtwork(track: Track) {
+    /**
+     * @return true if the artwork was set and the track persisted, false if publishing was skipped.
+     */
+    fun publishArtwork(track: Track): Boolean {
 
         Log.i(TAG, "Publish artwork, track: $track")
 
         if (sharedPreferences.getBoolean(SettingsActivity.KEY_PREF_WIFI_ONLY, false)) {
             if (!NetworkUtils.isWifiOn(this)) {
                 Log.i(TAG, "Not publishing artwork, WiFi required.")
-                return
+                return false
             }
         }
 
@@ -71,6 +74,8 @@ class MusicExtensionApplication : Application() {
         editor.putString("lastArtistName", track.artistName)
         editor.putString("lastAlbumName", track.albumName)
         editor.apply()
+
+        return true
     }
 
     companion object {
