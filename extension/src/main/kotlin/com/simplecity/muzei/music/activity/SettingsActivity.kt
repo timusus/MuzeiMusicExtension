@@ -16,13 +16,16 @@ class SettingsActivity : AppCompatActivity() {
 
     companion object {
         const val KEY_PREF_WIFI_ONLY = "pref_key_wifi_only"
+
+        // Used where dark icons aren't supported (status bar below API 23, navigation bar below API 26), so white icons stay legible
+        private const val DARK_SCRIM = 0x801B1B1B.toInt()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // The theme is light, so ask for dark status and navigation bar icons on a transparent bar
         enableEdgeToEdge(
-                statusBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
-                navigationBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+                statusBarStyle = SystemBarStyle.light(Color.TRANSPARENT, DARK_SCRIM),
+                navigationBarStyle = SystemBarStyle.light(Color.TRANSPARENT, DARK_SCRIM)
         )
         super.onCreate(savedInstanceState)
 
