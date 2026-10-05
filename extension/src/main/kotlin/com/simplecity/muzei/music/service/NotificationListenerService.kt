@@ -7,9 +7,16 @@ import android.media.session.MediaController
 import android.media.session.MediaSession
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.simplecity.muzei.music.MusicExtensionApplication
 import com.simplecity.muzei.music.model.Track
+import com.simplecity.muzei.music.utils.NetworkUtils
 
 
 class NotificationListenerService : android.service.notification.NotificationListenerService() {
@@ -25,7 +32,27 @@ class NotificationListenerService : android.service.notification.NotificationLis
 
     private var lastPublishedTrack: Track? = null
 
+    /**
+     * A track whose publishing was skipped (Wi-Fi only), to be retried when Wi-Fi becomes available.
+     */
+    private var skippedTrack: Track? = null
+
     private lateinit var mediaSessionManager: MediaSessionManager
+
+    private lateinit var connectivityManager: ConnectivityManager
+
+    private var networkCallbackRegistered = false
+
+    private val mainHandler = Handler(Looper.getMainLooper())
+
+    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
+        override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
+            val unmetered = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
+            if (unmetered || NetworkUtils.isWifiLike(networkCapabilities)) {
+                mainHandler.post { publishSkippedTrack() }
+            }
+        }
+    }
 
     private fun createCallback(controller: MediaController) = object : MediaController.Callback() {
         override fun onPlaybackStateChanged(state: PlaybackState?) {
@@ -46,6 +73,7 @@ class NotificationListenerService : android.service.notification.NotificationLis
         super.onCreate()
 
         mediaSessionManager = getSystemService(Context.MEDIA_SESSION_SERVICE) as MediaSessionManager
+        connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         refreshMediaControllers()
 
@@ -58,9 +86,12 @@ class NotificationListenerService : android.service.notification.NotificationLis
         refreshMediaControllers()
 
         addSessionStateChangeListener()
+
+        registerNetworkCallback()
     }
 
     override fun onListenerDisconnected() {
+        unregisterNetworkCallback()
         removeSessionStateChangeListener()
         clearMediaControllers()
 
@@ -68,6 +99,7 @@ class NotificationListenerService : android.service.notification.NotificationLis
     }
 
     override fun onDestroy() {
+        unregisterNetworkCallback()
         removeSessionStateChangeListener()
         clearMediaControllers()
 
@@ -149,14 +181,52 @@ class NotificationListenerService : android.service.notification.NotificationLis
                     return
                 }
 
-                if ((applicationContext as MusicExtensionApplication).publishArtwork(track)) {
-                    lastPublishedTrack = track
-                }
+                publishTrack(track)
                 return
             } catch (e: RuntimeException) {
                 Log.e(TAG, "An error occurred reading the media metadata: $e")
             }
         }
+    }
+
+    private fun publishTrack(track: Track) {
+        if ((applicationContext as MusicExtensionApplication).publishArtwork(track)) {
+            lastPublishedTrack = track
+            skippedTrack = null
+        } else {
+            skippedTrack = track
+        }
+    }
+
+    private fun publishSkippedTrack() {
+        if (!networkCallbackRegistered) {
+            return
+        }
+        skippedTrack?.let { publishTrack(it) }
+    }
+
+    private fun registerNetworkCallback() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N || networkCallbackRegistered) {
+            return
+        }
+        try {
+            connectivityManager.registerDefaultNetworkCallback(networkCallback)
+            networkCallbackRegistered = true
+        } catch (e: RuntimeException) {
+            Log.e(TAG, "Failed to register network callback: $e")
+        }
+    }
+
+    private fun unregisterNetworkCallback() {
+        if (!networkCallbackRegistered) {
+            return
+        }
+        try {
+            connectivityManager.unregisterNetworkCallback(networkCallback)
+        } catch (e: RuntimeException) {
+            Log.e(TAG, "Failed to unregister network callback: $e")
+        }
+        networkCallbackRegistered = false
     }
 
     private fun registerCallback(session: Session) {

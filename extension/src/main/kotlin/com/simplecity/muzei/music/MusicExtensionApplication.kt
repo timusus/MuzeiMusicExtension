@@ -37,11 +37,16 @@ class MusicExtensionApplication : Application() {
     }
 
     /**
-     * @return true if the artwork was set and the track persisted, false if publishing was skipped.
+     * The track is persisted either way.
+     *
+     * @return true if the artwork was set, false if publishing was skipped.
      */
     fun publishArtwork(track: Track): Boolean {
 
         Log.i(TAG, "Publish artwork, track: $track")
+
+        // Persist the track even if publishing is skipped, so it is published on the next load.
+        persistTrack(track)
 
         if (sharedPreferences.getBoolean(SettingsActivity.KEY_PREF_WIFI_ONLY, false)) {
             if (!NetworkUtils.isWifiOn(this)) {
@@ -68,14 +73,15 @@ class MusicExtensionApplication : Application() {
                                 .build()
                 )
 
-
-        val editor = sharedPreferences.edit()
-        editor.putString("lastTrackName", track.name)
-        editor.putString("lastArtistName", track.artistName)
-        editor.putString("lastAlbumName", track.albumName)
-        editor.apply()
-
         return true
+    }
+
+    private fun persistTrack(track: Track) {
+        sharedPreferences.edit()
+                .putString("lastTrackName", track.name)
+                .putString("lastArtistName", track.artistName)
+                .putString("lastAlbumName", track.albumName)
+                .apply()
     }
 
     companion object {
