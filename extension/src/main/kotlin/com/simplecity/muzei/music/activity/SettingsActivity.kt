@@ -30,10 +30,10 @@ class SettingsActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        // The action bar handles the top inset; keep the preferences clear of the other bars
+        // The decor action bar offsets the content by its own height, but not by the status bar; keep the preferences clear of the system bars
         ViewCompat.setOnApplyWindowInsetsListener(findViewById<View>(R.id.settingsContainer)) { view, windowInsets ->
             val bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
-            view.setPadding(bars.left, 0, bars.right, bars.bottom)
+            view.setPadding(bars.left, bars.top, bars.right, bars.bottom)
             windowInsets
         }
 
