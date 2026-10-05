@@ -53,7 +53,15 @@ class MusicExtensionApplication : Application() {
                                 .token(track.hashCode().toString())
                                 .title(track.name)
                                 .byline("${track.artistName} - ${track.albumName}")
-                                .persistentUri(Uri.parse("https://artwork.shuttlemusicplayer.app/api/v1/artwork?artist=${track.artistName}&album=${track.albumName}"))
+                                .persistentUri(
+                                        Uri.Builder()
+                                                .scheme("https")
+                                                .authority("artwork.shuttlemusicplayer.app")
+                                                .appendEncodedPath("api/v1/artwork")
+                                                .appendQueryParameter("artist", track.artistName)
+                                                .appendQueryParameter("album", track.albumName)
+                                                .build()
+                                )
                                 .build()
                 )
 

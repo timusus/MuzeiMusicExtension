@@ -1,68 +1,54 @@
-import org.jetbrains.annotations.Nullable
-
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
-
-repositories {
-    mavenCentral()
-    google()
+plugins {
+    id 'com.android.application'
 }
 
-@Nullable
-def getProperties(String fileName) {
-    final Properties properties = new Properties()
-    def file = file(fileName)
-    if (file.exists()) {
-        file.withInputStream { stream -> properties.load(stream) }
-    }
-    return properties
-}
-
-static def getProperty(@Nullable Properties properties, String name) {
-    return properties.getProperty(name) ?: "$name missing"
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('keystore.properties')
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.withInputStream { stream -> keystoreProperties.load(stream) }
 }
 
 dependencies {
 
     // Muzei API
-    implementation 'com.google.android.apps.muzei:muzei-api:3.1.0'
+    implementation 'com.google.android.apps.muzei:muzei-api:3.4.2'
 
     // Support libs
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-
-    // Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'androidx.core:core-ktx:1.17.0'
 }
 
 android {
-    compileSdkVersion 29
+    namespace 'com.simplecity.muzei.music'
+    compileSdk 36
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 29
+        minSdk 21
+        targetSdk 36
 
-        versionName '2.1.0'
-        versionCode 81
+        versionName '2.2.0'
+        versionCode 82
     }
 
     signingConfigs {
         release {
-            Properties properties = getProperties('../keystore.properties')
-            storeFile file(getProperty(properties, 'store'))
-            keyAlias getProperty(properties, 'alias')
-            storePassword getProperty(properties, 'storePass')
-            keyPassword getProperty(properties, 'pass')
+            // Release stays unsigned when keystore.properties is absent
+            if (keystoreProperties.containsKey('store')) {
+                storeFile file(keystoreProperties.getProperty('store'))
+                keyAlias keystoreProperties.getProperty('alias')
+                storePassword keystoreProperties.getProperty('storePass')
+                keyPassword keystoreProperties.getProperty('pass')
+            }
         }
     }
 
     buildTypes {
-        debug {
-        }
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), file('proguard-project.txt')
-            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), file('proguard-project.txt')
+            if (keystoreProperties.containsKey('store')) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 
@@ -70,10 +56,8 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-    android {
-        compileOptions {
-            targetCompatibility = "8"
-            sourceCompatibility = "8"
-        }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 }
