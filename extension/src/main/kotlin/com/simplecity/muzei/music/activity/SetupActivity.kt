@@ -20,7 +20,10 @@ class SetupActivity : AppCompatActivity() {
 
     private var hasSeenDialog = false
 
-    private var isFirstPresentation = true
+    // Set when the user leaves this screen (e.g. for notification settings), but not on a configuration change
+    private var hasLeftScreen = false
+
+    private var dialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -28,7 +31,7 @@ class SetupActivity : AppCompatActivity() {
 
         if (savedInstanceState != null) {
             hasSeenDialog = savedInstanceState.getBoolean(STATE_HAS_SEEN_DIALOG, false)
-            isFirstPresentation = savedInstanceState.getBoolean(STATE_IS_FIRST_PRESENTATION, true)
+            hasLeftScreen = savedInstanceState.getBoolean(STATE_HAS_LEFT_SCREEN, false)
         }
 
         val notificationListenerEnabled = notificationListenerEnabled()
@@ -62,22 +65,35 @@ class SetupActivity : AppCompatActivity() {
             return
         }
 
-        if (!isFirstPresentation) {
+        if (hasLeftScreen) {
+            hasLeftScreen = false
             if (hasSeenDialog) {
                 setResultAndFinish()
             } else {
                 showDialog()
             }
         }
+    }
 
-        isFirstPresentation = false
+    override fun onStop() {
+        super.onStop()
+
+        if (!isChangingConfigurations) {
+            hasLeftScreen = true
+        }
+    }
+
+    override fun onDestroy() {
+        dialog?.dismiss()
+        dialog = null
+        super.onDestroy()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
         outState.putBoolean(STATE_HAS_SEEN_DIALOG, hasSeenDialog)
-        outState.putBoolean(STATE_IS_FIRST_PRESENTATION, isFirstPresentation)
+        outState.putBoolean(STATE_HAS_LEFT_SCREEN, hasLeftScreen)
     }
 
     private fun notificationListenerEnabled(): Boolean {
@@ -87,7 +103,7 @@ class SetupActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "SetupActivity"
         private const val STATE_HAS_SEEN_DIALOG = "hasSeenDialog"
-        private const val STATE_IS_FIRST_PRESENTATION = "isFirstPresentation"
+        private const val STATE_HAS_LEFT_SCREEN = "hasLeftScreen"
     }
 
     private fun openNotificationListenerSettings() {
@@ -101,7 +117,7 @@ class SetupActivity : AppCompatActivity() {
     private fun showDialog() {
         hasSeenDialog = true
 
-        AlertDialog.Builder(this)
+        dialog = AlertDialog.Builder(this)
                 .setTitle(getString(R.string.notificationSettingsDialogTitle))
                 .setMessage(getString(R.string.notificationSettingsDialogMessage))
                 .setPositiveButton(R.string.settingsButton) { _, _ ->
