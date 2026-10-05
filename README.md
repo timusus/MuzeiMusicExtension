@@ -10,7 +10,17 @@ Muzei Music Extension is on the [Play Store](https://play.google.com/store/apps/
 
 ### Changelog:
 
-Current Version: 2.1.0
+Current Version: 2.2.1
+
+#### 2.2.1
+- Artwork now follows whichever music app is actually playing, rather than a paused session from another player. Players with empty metadata are ignored, and each track is published once.
+- "Download via WiFi only" no longer loses tracks: a track held back on mobile data is published when Wi-Fi returns or the setting is turned off. Unmetered networks and VPN over Wi-Fi count as Wi-Fi.
+- Settings screen has a title bar and visible status bar icons on recent Android versions.
+- The setup screen no longer loops back to its dialog.
+- Smaller release build.
+
+#### 2.2.0
+- Updated for Android 16 (target SDK 36) and the latest Muzei API.
 
 #### 2.1.0
 - Google have nerfed manifest declared broadcast receivers, which means we can no longer listen to `metachanged` events from various apps, since they're not targeted directly at Muzei. So, we now rely exclusively on the NotificationListenerService for metadata & playstate changes.
