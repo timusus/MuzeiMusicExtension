@@ -76,7 +76,7 @@ class MusicExtensionApplication : Application() {
         return true
     }
 
-    private fun persistTrack(track: Track) {
+    fun persistTrack(track: Track) {
         sharedPreferences.edit()
                 .putString("lastTrackName", track.name)
                 .putString("lastArtistName", track.artistName)

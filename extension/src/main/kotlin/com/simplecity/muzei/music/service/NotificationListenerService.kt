@@ -176,6 +176,11 @@ class NotificationListenerService : android.service.notification.NotificationLis
                 ) ?: continue
 
                 if (track == lastPublishedTrack) {
+                    // The published track is playing again: drop any skipped track and make it the persisted one
+                    if (skippedTrack != null) {
+                        skippedTrack = null
+                        (applicationContext as MusicExtensionApplication).persistTrack(track)
+                    }
                     return
                 }
 
