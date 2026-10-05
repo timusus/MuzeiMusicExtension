@@ -23,11 +23,14 @@ object NetworkUtils {
     }
 
     /**
-     * @return true if the capabilities describe an internet-capable Wi-Fi or Ethernet network.
+     * @return true if the capabilities describe an internet-capable network which is Wi-Fi, Ethernet or unmetered
+     * (a VPN over Wi-Fi reports only TRANSPORT_VPN on API 23-28, but is not metered).
      */
     fun isWifiLike(capabilities: NetworkCapabilities?): Boolean {
         return capabilities != null
                 && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                && (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET))
+                && (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                || capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
+                || capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED))
     }
 }

@@ -51,8 +51,7 @@ class NotificationListenerService : android.service.notification.NotificationLis
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
-            val unmetered = networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
-            if (unmetered || NetworkUtils.isWifiLike(networkCapabilities)) {
+            if (NetworkUtils.isWifiLike(networkCapabilities)) {
                 mainHandler.post { publishSkippedTrack() }
             }
         }
