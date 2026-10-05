@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.media.MediaMetadata
 import android.media.session.MediaController
+import android.media.session.MediaSession
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
 import android.util.Log
@@ -15,56 +16,33 @@ class NotificationListenerService : android.service.notification.NotificationLis
 
     private val TAG = this.javaClass.simpleName
 
-    private var mediaController: MediaController? = null
+    private val mediaControllers = mutableMapOf<MediaSession.Token, MediaController>()
+
+    private var lastPublishedTrack: Track? = null
 
     private lateinit var mediaSessionManager: MediaSessionManager
 
     private val mediaControllerCallback: MediaController.Callback = object : MediaController.Callback() {
-        override fun onPlaybackStateChanged(playbackState: PlaybackState?) {
-            when (playbackState?.state) {
-                PlaybackState.STATE_PLAYING -> {
-                    mediaController?.metadata?.let { metadata ->
-                        try {
-                            (applicationContext as MusicExtensionApplication).publishArtwork(
-                                    Track(
-                                            metadata.getString(MediaMetadata.METADATA_KEY_TITLE),
-                                            metadata.getString(MediaMetadata.METADATA_KEY_ARTIST),
-                                            metadata.getString(MediaMetadata.METADATA_KEY_ALBUM)
-                                    )
-                            )
-                        } catch (e: RuntimeException) {
-                            Log.e(TAG, "An error occurred reading the media metadata: $e")
-                        }
-                    }
-                }
-            }
+        override fun onPlaybackStateChanged(state: PlaybackState?) {
+            publishPlayingTrack()
         }
 
         override fun onMetadataChanged(metadata: MediaMetadata?) {
-            metadata?.let { metadata ->
-                try {
-                    (applicationContext as MusicExtensionApplication).publishArtwork(
-                            Track(
-                                    metadata.getString(MediaMetadata.METADATA_KEY_TITLE),
-                                    metadata.getString(MediaMetadata.METADATA_KEY_ARTIST),
-                                    metadata.getString(MediaMetadata.METADATA_KEY_ALBUM)
-                            )
-                    )
-                } catch (e: RuntimeException) {
-                    Log.e(TAG, "An error occurred reading the media metadata: $e")
-                }
-            }
+            publishPlayingTrack()
         }
     }
 
-    private val activeSessionsChangedListener = MediaSessionManager.OnActiveSessionsChangedListener { registerActiveMediaControllerCallback(mediaSessionManager) }
+    private val activeSessionsChangedListener = MediaSessionManager.OnActiveSessionsChangedListener { controllers ->
+        updateMediaControllers(controllers.orEmpty())
+        publishPlayingTrack()
+    }
 
     override fun onCreate() {
         super.onCreate()
 
         mediaSessionManager = getSystemService(Context.MEDIA_SESSION_SERVICE) as MediaSessionManager
 
-        registerActiveMediaControllerCallback(mediaSessionManager)
+        refreshMediaControllers()
 
         addSessionStateChangeListener()
     }
@@ -72,11 +50,20 @@ class NotificationListenerService : android.service.notification.NotificationLis
     override fun onListenerConnected() {
         super.onListenerConnected()
 
+        refreshMediaControllers()
+
         addSessionStateChangeListener()
     }
 
     override fun onDestroy() {
-        unregisterCallback(mediaController)
+        try {
+            mediaSessionManager.removeOnActiveSessionsChangedListener(activeSessionsChangedListener)
+        } catch (e: SecurityException) {
+            Log.e(TAG, "Failed to remove session change listener")
+        }
+
+        mediaControllers.values.toList().forEach { unregisterCallback(it) }
+        mediaControllers.clear()
 
         super.onDestroy()
     }
@@ -90,43 +77,70 @@ class NotificationListenerService : android.service.notification.NotificationLis
         }
     }
 
-    private fun getActiveMediaController(mediaSessionManager: MediaSessionManager): MediaController? {
-        return try {
-            val mediaControllers = mediaSessionManager.getActiveSessions(ComponentName(this, NotificationListenerService::class.java))
-            mediaControllers.firstOrNull()
+    private fun refreshMediaControllers() {
+        try {
+            val controllers = mediaSessionManager.getActiveSessions(ComponentName(this, NotificationListenerService::class.java))
+            updateMediaControllers(controllers)
+            publishPlayingTrack()
         } catch (e: SecurityException) {
-            null
+            Log.e(TAG, "Failed to get active sessions")
         }
     }
 
-    private fun registerActiveMediaControllerCallback(mediaSessionManager: MediaSessionManager) {
-        getActiveMediaController(mediaSessionManager)?.let { mediaController ->
-            registerCallback(mediaController)
+    /**
+     * Registers a callback on every active controller, and unregisters the callback
+     * for any controller which is no longer in the list.
+     */
+    private fun updateMediaControllers(controllers: List<MediaController>) {
+        val activeTokens = controllers.map { it.sessionToken }.toSet()
 
-            mediaController.metadata?.let { metadata ->
-                mediaControllerCallback.onMetadataChanged(metadata)
+        mediaControllers.keys.filter { it !in activeTokens }.forEach { token ->
+            mediaControllers.remove(token)?.let { unregisterCallback(it) }
+        }
+
+        controllers.forEach { controller ->
+            if (!mediaControllers.containsKey(controller.sessionToken)) {
+                registerCallback(controller)
+                mediaControllers[controller.sessionToken] = controller
             }
         }
     }
 
-    private fun registerCallback(mediaController: MediaController) {
+    /**
+     * Publishes the track from the controller which is currently playing. If nothing is
+     * playing, the last published artwork is left alone.
+     */
+    private fun publishPlayingTrack() {
+        val controller = mediaControllers.values.firstOrNull { it.playbackState?.state == PlaybackState.STATE_PLAYING } ?: return
 
-        unregisterCallback(this.mediaController)
+        try {
+            val metadata = controller.metadata ?: return
+            val track = Track.build(
+                    metadata.getString(MediaMetadata.METADATA_KEY_TITLE),
+                    metadata.getString(MediaMetadata.METADATA_KEY_ARTIST),
+                    metadata.getString(MediaMetadata.METADATA_KEY_ALBUM)
+            ) ?: return
 
-        Log.i(TAG, "Registering callback for ${mediaController.packageName}")
+            if (track == lastPublishedTrack) {
+                return
+            }
 
-        this.mediaController = mediaController
-        mediaControllerCallback.let { mediaControllerCallback ->
-            mediaController.registerCallback(mediaControllerCallback)
+            lastPublishedTrack = track
+            (applicationContext as MusicExtensionApplication).publishArtwork(track)
+        } catch (e: RuntimeException) {
+            Log.e(TAG, "An error occurred reading the media metadata: $e")
         }
     }
 
-    private fun unregisterCallback(mediaController: MediaController?) {
+    private fun registerCallback(mediaController: MediaController) {
+        Log.i(TAG, "Registering callback for ${mediaController.packageName}")
 
-        Log.i(TAG, "Unregistering callback for ${mediaController?.packageName}")
+        mediaController.registerCallback(mediaControllerCallback)
+    }
 
-        mediaControllerCallback.let { mediaControllerCallback ->
-            mediaController?.unregisterCallback(mediaControllerCallback)
-        }
+    private fun unregisterCallback(mediaController: MediaController) {
+        Log.i(TAG, "Unregistering callback for ${mediaController.packageName}")
+
+        mediaController.unregisterCallback(mediaControllerCallback)
     }
 }

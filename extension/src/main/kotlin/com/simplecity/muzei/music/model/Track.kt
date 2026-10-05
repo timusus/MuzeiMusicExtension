@@ -5,7 +5,7 @@ open class Track(val name: String, val artistName: String, val albumName: String
     companion object {
 
         fun build(name: String?, artistName: String?, albumName: String?): Track? {
-            if (name != null && albumName != null && artistName != null) {
+            if (!name.isNullOrBlank() && !albumName.isNullOrBlank() && !artistName.isNullOrBlank()) {
                 return Track(name, artistName, albumName)
             }
             return null
