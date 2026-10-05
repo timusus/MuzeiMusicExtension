@@ -21,7 +21,9 @@ import com.simplecity.muzei.music.utils.NetworkUtils
 
 class NotificationListenerService : android.service.notification.NotificationListenerService() {
 
-    private val TAG = this.javaClass.simpleName
+    companion object {
+        private const val TAG = "NotificationListener"
+    }
 
     private class Session(val controller: MediaController, val callback: MediaController.Callback)
 
@@ -74,10 +76,6 @@ class NotificationListenerService : android.service.notification.NotificationLis
 
         mediaSessionManager = getSystemService(Context.MEDIA_SESSION_SERVICE) as MediaSessionManager
         connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-        refreshMediaControllers()
-
-        addSessionStateChangeListener()
     }
 
     override fun onListenerConnected() {

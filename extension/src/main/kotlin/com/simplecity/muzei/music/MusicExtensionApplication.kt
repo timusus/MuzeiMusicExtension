@@ -58,7 +58,7 @@ class MusicExtensionApplication : Application() {
         ProviderContract.getProviderClient(this, "com.simplecity.muzei.music")
                 .setArtwork(
                         Artwork.Builder()
-                                .token(track.hashCode().toString())
+                                .token("${track.artistName}|${track.albumName}|${track.name}")
                                 .title(track.name)
                                 .byline("${track.artistName} - ${track.albumName}")
                                 .persistentUri(
